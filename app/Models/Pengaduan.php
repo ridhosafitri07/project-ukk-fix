@@ -21,7 +21,15 @@ class Pengaduan extends Model
         'id_item',
         'tgl_pengajuan',
         'tgl_selesai',
+        'tgl_verifikasi',
+        'catatan_admin',
         'saran_petugas'
+    ];
+
+    protected $dates = [
+        'tgl_pengajuan',
+        'tgl_selesai',
+        'tgl_verifikasi'
     ];
 
     public function user()
@@ -37,5 +45,10 @@ class Pengaduan extends Model
     public function item()
     {
         return $this->belongsTo(Item::class, 'id_item', 'id_item');
+    }
+
+    public function temporary_items()
+    {
+        return $this->hasMany(TemporaryItem::class, 'id_pengaduan', 'id_pengaduan');
     }
 }

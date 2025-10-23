@@ -14,12 +14,12 @@ class PengaduanController extends Controller
         $pengaduans = Pengaduan::where('id_user', Auth::id())
             ->orderBy('tgl_pengajuan', 'desc')
             ->get();
-        return view('siswa.pengaduan.index', compact('pengaduans'));
+        return view('pengguna.pengaduan.index', compact('pengaduans'));
     }
 
     public function create()
     {
-        return view('siswa.pengaduan.create');
+        return view('pengguna.pengaduan.create');
     }
 
     public function store(Request $request)
@@ -55,7 +55,7 @@ class PengaduanController extends Controller
         if ($pengaduan->id_user !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
-        return view('siswa.pengaduan.show', compact('pengaduan'));
+        return view('pengguna.pengaduan.show', compact('pengaduan'));
     }
 
     public function edit(Pengaduan $pengaduan)
@@ -69,7 +69,7 @@ class PengaduanController extends Controller
                 ->with('error', 'Pengaduan yang sudah diproses tidak dapat diubah.');
         }
 
-        return view('siswa.pengaduan.edit', compact('pengaduan'));
+        return view('pengguna.pengaduan.edit', compact('pengaduan'));
     }
 
     public function update(Request $request, Pengaduan $pengaduan)

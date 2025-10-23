@@ -34,7 +34,7 @@
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-gray-900">Buat Pengaduan Baru</h2>
-                <a href="{{ route('siswa.dashboard') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                <a href="{{ route('pengguna.dashboard') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                     Kembali
                 </a>
             </div>

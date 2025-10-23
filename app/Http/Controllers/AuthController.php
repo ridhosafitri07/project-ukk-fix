@@ -33,14 +33,12 @@ class AuthController extends Controller
             // Redirect based on role
             $user = Auth::user();
             switch ($user->role) {
-                case User::ROLE_ADMIN:
+                case 'admin':
                     return redirect()->intended('/admin/dashboard');
-                case User::ROLE_PETUGAS:
+                case 'petugas':
                     return redirect()->intended('/petugas/dashboard');
-                case User::ROLE_GURU:
-                    return redirect()->intended('/guru/dashboard');
-                case User::ROLE_SISWA:
-                    return redirect()->intended('/siswa/dashboard');
+                case 'pengguna':
+                    return redirect()->intended('/pengguna/dashboard');
                 default:
                     return redirect()->intended('/');
             }
@@ -63,7 +61,7 @@ class AuthController extends Controller
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'nama_pengguna' => $request->nama_pengguna,
-            'role' => User::ROLE_SISWA, // Default role for new registrations
+            'role' => 'pengguna', // Default role for new registrations
         ]);
 
         Auth::login($user);

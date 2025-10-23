@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register the app-layout component
+        \Illuminate\Support\Facades\Blade::component('app-layout', \App\View\Components\AppLayout::class);
     }
 }

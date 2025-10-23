@@ -31,10 +31,8 @@ class CheckRole
                 return redirect('/admin/dashboard');
             case 'petugas':
                 return redirect('/petugas/dashboard');
-            case 'guru':
-                return redirect('/guru/dashboard');
-            case 'siswa':
-                return redirect('/siswa/dashboard');
+            case 'pengguna':
+                return redirect('/pengguna/dashboard');
             default:
                 return redirect('/')->with('error', 'Unauthorized access.');
         }

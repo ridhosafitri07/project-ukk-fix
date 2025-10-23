@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\SarprasController;
+use App\Http\Controllers\AdminPengaduanController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,19 +37,35 @@ Route::middleware('auth')->group(function () {
                 return redirect()->route('admin.dashboard');
             case 'petugas':
                 return redirect()->route('petugas.dashboard');
-            case 'guru':
-                return redirect()->route('guru.dashboard');
-            case 'siswa':
-                return redirect()->route('siswa.dashboard');
+            case 'pengguna':
+                return redirect()->route('pengguna.dashboard');
             default:
                 return redirect('/');
         }
     })->name('dashboard');
 
     Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+
+        // Pengaduan Management Routes
+        Route::prefix('pengaduan')->group(function () {
+            Route::get('/', [AdminPengaduanController::class, 'index'])->name('admin.pengaduan.index');
+            Route::get('/{pengaduan}', [AdminPengaduanController::class, 'show'])->name('admin.pengaduan.show');
+            Route::put('/{pengaduan}/status', [AdminPengaduanController::class, 'updateStatus'])->name('admin.pengaduan.update-status');
+        });
+
+        // Sarpras Management Routes
+        Route::prefix('sarpras')->group(function () {
+            Route::get('/', [SarprasController::class, 'index'])->name('admin.sarpras.index');
+            Route::get('/permintaan', [SarprasController::class, 'permintaanList'])->name('admin.sarpras.permintaan-list');
+            Route::get('/permintaan/{id}', [SarprasController::class, 'showPermintaan'])->name('admin.sarpras.show-permintaan');
+            Route::put('/permintaan/{id}/status', [SarprasController::class, 'updateStatus'])->name('admin.sarpras.update-status');
+            Route::get('/history', [SarprasController::class, 'history'])->name('admin.sarpras.history');
+            Route::get('/history/export', [SarprasController::class, 'exportHistory'])->name('admin.sarpras.export-history');
+        });
+
+        // User Management Routes
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class, ['as' => 'admin']);
     });
 
     Route::prefix('petugas')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':petugas'])->group(function () {
@@ -55,13 +74,7 @@ Route::middleware('auth')->group(function () {
         })->name('petugas.dashboard');
     });
 
-    Route::prefix('guru')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':guru'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('guru.dashboard');
-        })->name('guru.dashboard');
-    });
-
-    Route::prefix('siswa')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':siswa'])->group(function () {
+    Route::prefix('pengguna')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':pengguna'])->group(function () {
         Route::get('/dashboard', function () {
             $user = auth()->user();
             $query = \App\Models\Pengaduan::where('id_user', $user->id_user);
@@ -77,8 +90,8 @@ Route::middleware('auth')->group(function () {
                     ->get()
             ];
             
-            return view('siswa.dashboard', $data);
-        })->name('siswa.dashboard');
+            return view('pengguna.dashboard', $data);
+        })->name('pengguna.dashboard');
 
         // Pengaduan routes
         Route::get('/pengaduan', [PengaduanController::class, 'index'])->name('pengaduan.index');

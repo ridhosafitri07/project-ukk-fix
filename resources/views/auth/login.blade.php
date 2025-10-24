@@ -17,6 +17,14 @@
             <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
                 @csrf
                 
+                @if (session('error'))
+                <div class="rounded-md bg-red-50 p-4 mb-4">
+                    <div class="text-sm text-red-700">
+                        <p>{{ session('error') }}</p>
+                    </div>
+                </div>
+                @endif
+                
                 @if ($errors->any())
                 <div class="rounded-md bg-red-50 p-4 mb-4">
                     <div class="text-sm text-red-700">

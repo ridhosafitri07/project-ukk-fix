@@ -6,21 +6,30 @@ use App\Http\Controllers\PengaduanController;
 use App\Http\Controllers\SarprasController;
 use App\Http\Controllers\AdminPengaduanController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Petugas\PetugasController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
+
+// Route untuk homepage tanpa middleware
+Route::get('/', function () {
+    if (auth()->check()) {
+        $role = auth()->user()->role;
+        return match ($role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'petugas' => redirect()->route('petugas.dashboard'),
+            'pengguna' => redirect()->route('pengguna.dashboard'),
+            default => redirect()->route('login')
+        };
+    }
+    return redirect()->route('login');
+});
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthController::class, 'showLogin'])->name('login');
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -30,20 +39,23 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
-    Route::get('/dashboard', function () {
-        $role = auth()->user()->role;
-        switch ($role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'petugas':
-                return redirect()->route('petugas.dashboard');
-            case 'pengguna':
-                return redirect()->route('pengguna.dashboard');
-            default:
-                return redirect('/');
+   Route::get('/dashboard', function () {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return redirect()->route('login');
         }
+
+        // Redirect langsung ke dashboard sesuai role
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'petugas' => redirect()->route('petugas.dashboard'),
+            'pengguna' => redirect()->route('pengguna.dashboard'),
+            default => redirect()->route('login')
+        };
     })->name('dashboard');
 
+    // ===== ADMIN ROUTES =====
     Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -68,12 +80,26 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class, ['as' => 'admin']);
     });
 
+    // ===== PETUGAS ROUTES =====
     Route::prefix('petugas')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':petugas'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('petugas.dashboard');
-        })->name('petugas.dashboard');
+        // Dashboard
+        Route::get('/dashboard', [PetugasController::class, 'dashboard'])->name('petugas.dashboard');
+        
+        // Pengaduan Management
+        Route::prefix('pengaduan')->group(function () {
+            Route::get('/', [PetugasController::class, 'pengaduanIndex'])->name('petugas.pengaduan.index');
+            Route::get('/{pengaduan}', [PetugasController::class, 'pengaduanShow'])->name('petugas.pengaduan.show');
+            Route::put('/{pengaduan}/status', [PetugasController::class, 'updateStatus'])->name('petugas.pengaduan.update-status');
+        });
+        
+        // Riwayat
+        Route::prefix('riwayat')->group(function () {
+            Route::get('/', [PetugasController::class, 'riwayatIndex'])->name('petugas.riwayat.index');
+            Route::get('/{pengaduan}', [PetugasController::class, 'riwayatShow'])->name('petugas.riwayat.show');
+        });
     });
 
+    // ===== PENGGUNA ROUTES =====
     Route::prefix('pengguna')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':pengguna'])->group(function () {
         Route::get('/dashboard', function () {
             $user = auth()->user();

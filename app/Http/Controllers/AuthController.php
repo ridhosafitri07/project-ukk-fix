@@ -30,18 +30,17 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // Redirect based on role
             $user = Auth::user();
-            switch ($user->role) {
-                case 'admin':
-                    return redirect()->intended('/admin/dashboard');
-                case 'petugas':
-                    return redirect()->intended('/petugas/dashboard');
-                case 'pengguna':
-                    return redirect()->intended('/pengguna/dashboard');
-                default:
-                    return redirect()->intended('/');
-            }
+            
+            // Redirect langsung ke dashboard sesuai role
+            $route = match ($user->role) {
+                'admin' => 'admin.dashboard',
+                'petugas' => 'petugas.dashboard',
+                'pengguna' => 'pengguna.dashboard',
+                default => 'login'
+            };
+            
+            return redirect()->route($route);
         }
 
         return back()->withErrors([

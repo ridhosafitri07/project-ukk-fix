@@ -16,25 +16,19 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role)
     {
+        // Jika belum login, redirect ke login
         if (!Auth::check()) {
-            return redirect('login');
+            return redirect()->route('login');
         }
 
         $user = Auth::user();
+        
+        // Jika role sesuai, lanjutkan request
         if ($user->role === $role) {
             return $next($request);
         }
 
-        // Redirect to appropriate dashboard based on user's role
-        switch ($user->role) {
-            case 'admin':
-                return redirect('/admin/dashboard');
-            case 'petugas':
-                return redirect('/petugas/dashboard');
-            case 'pengguna':
-                return redirect('/pengguna/dashboard');
-            default:
-                return redirect('/')->with('error', 'Unauthorized access.');
-        }
+        // Jika role tidak sesuai, tampilkan error 403
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
     }
 }

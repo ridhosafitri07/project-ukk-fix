@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengaduan;
+use App\Models\Petugas;
 use App\Models\TemporaryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ class AdminPengaduanController extends Controller
 {
     public function index()
     {
-        $pengaduan = Pengaduan::with('user')
+        $pengaduan = Pengaduan::with('user', 'petugas')
             ->orderBy('tgl_pengajuan', 'desc')
             ->paginate(10);
 
@@ -28,16 +29,36 @@ class AdminPengaduanController extends Controller
 
     public function show(Pengaduan $pengaduan)
     {
-        $pengaduan->load(['user', 'temporary_items']);
-        return view('admin.pengaduan.show', compact('pengaduan'));
+        $pengaduan->load(['user', 'petugas', 'temporary_items']);
+        
+        // Ambil petugas dari tabel user dan join dengan tabel petugas
+        $petugasList = Petugas::join('user', 'petugas.id_user', '=', 'user.id_user')
+            ->where('user.role', 'petugas')
+            ->select('petugas.*', 'user.username', 'user.nama_pengguna', 'user.role')
+            ->orderBy('petugas.nama', 'asc')
+            ->get();
+        
+        return view('admin.pengaduan.show', compact('pengaduan', 'petugasList'));
     }
 
     public function updateStatus(Request $request, Pengaduan $pengaduan)
     {
-        $request->validate([
+        $validationRules = [
             'status' => 'required|in:Disetujui,Ditolak,Diproses,Selesai',
             'catatan_admin' => 'required|string|max:255'
-        ]);
+        ];
+        
+        if ($request->status === 'Disetujui') {
+            $validationRules['id_petugas'] = 'required|exists:petugas,id_petugas';
+            
+            // Validasi tambahan untuk memastikan petugas yang dipilih sesuai
+            $petugas = Petugas::find($request->id_petugas);
+            if (!$petugas) {
+                return back()->with('error', 'Petugas tidak ditemukan!');
+            }
+        }
+        
+        $request->validate($validationRules);
 
         DB::beginTransaction();
         try {
@@ -46,13 +67,13 @@ class AdminPengaduanController extends Controller
             
             if ($request->status === 'Disetujui') {
                 $pengaduan->tgl_verifikasi = now();
+                $pengaduan->id_petugas = $request->id_petugas;
             } elseif ($request->status === 'Selesai') {
                 $pengaduan->tgl_selesai = now();
             }
             
             $pengaduan->save();
 
-            // Update temporary items jika ada
             if ($request->status === 'Disetujui' && $pengaduan->temporary_items->count() > 0) {
                 foreach ($pengaduan->temporary_items as $item) {
                     $item->status_permintaan = 'Disetujui';
@@ -63,12 +84,19 @@ class AdminPengaduanController extends Controller
             }
 
             DB::commit();
+            
+            $message = 'Status pengaduan berhasil diperbarui';
+            if ($request->status === 'Disetujui') {
+                $petugas = Petugas::find($request->id_petugas);
+                $message .= ' dan ditugaskan ke ' . $petugas->nama;
+            }
+            
             return redirect()
                 ->route('admin.pengaduan.show', $pengaduan)
-                ->with('success', 'Status pengaduan berhasil diperbarui');
+                ->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memperbarui status');
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui status: ' . $e->getMessage());
         }
     }
 }

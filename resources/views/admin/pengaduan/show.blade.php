@@ -191,7 +191,7 @@
                             </label>
                             <textarea id="catatan_admin" name="catatan_admin" rows="4"
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                    placeholder="Tambahkan catatan untuk pengaduan ini..." required></textarea>
+                                    placeholder="Tambahkan catatan untuk pengaduan ini..." ></textarea>
                         </div>
 
                         <div class="flex justify-end space-x-3">

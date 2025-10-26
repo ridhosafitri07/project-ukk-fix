@@ -10,10 +10,35 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('id_user', 'desc')->get();
-        return view('admin.users.index', compact('users'));
+        $query = User::query();
+        
+        // Filter by role if requested
+        if ($request->filled('role') && $request->role !== 'all') {
+            $query->where('role', $request->role);
+        }
+        
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_pengguna', 'like', "%{$search}%")
+                  ->orWhere('username', 'like', "%{$search}%");
+            });
+        }
+        
+        $users = $query->orderBy('id_user', 'desc')->paginate(10);
+        
+        // Count by role for statistics
+        $statistics = [
+            'total' => User::count(),
+            'admin' => User::where('role', 'admin')->count(),
+            'petugas' => User::where('role', 'petugas')->count(),
+            'pengguna' => User::where('role', 'pengguna')->count(),
+        ];
+        
+        return view('admin.users.index', compact('users', 'statistics'));
     }
 
     public function create()
@@ -28,6 +53,13 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:user',
             'password' => 'required|string|min:6',
             'role' => ['required', Rule::in(['admin', 'petugas', 'pengguna'])],
+        ], [
+            'nama_pengguna.required' => 'Nama lengkap wajib diisi',
+            'username.required' => 'Username wajib diisi',
+            'username.unique' => 'Username sudah digunakan',
+            'password.required' => 'Password wajib diisi',
+            'password.min' => 'Password minimal 6 karakter',
+            'role.required' => 'Role wajib dipilih',
         ]);
 
         User::create([
@@ -53,6 +85,12 @@ class UserController extends Controller
             'username' => ['required', 'string', 'max:255', Rule::unique('user')->ignore($user->id_user, 'id_user')],
             'password' => 'nullable|string|min:6',
             'role' => ['required', Rule::in(['admin', 'petugas', 'pengguna'])],
+        ], [
+            'nama_pengguna.required' => 'Nama lengkap wajib diisi',
+            'username.required' => 'Username wajib diisi',
+            'username.unique' => 'Username sudah digunakan',
+            'password.min' => 'Password minimal 6 karakter',
+            'role.required' => 'Role wajib dipilih',
         ]);
 
         $user->nama_pengguna = $validated['nama_pengguna'];
@@ -69,6 +107,12 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        // Prevent deleting own account
+        if ($user->id_user === auth()->id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Tidak dapat menghapus akun sendiri');
+        }
+        
         $user->delete();
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dihapus');

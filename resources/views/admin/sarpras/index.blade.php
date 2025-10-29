@@ -7,7 +7,7 @@
 @section('content')
 <!-- Stats Overview -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-sm font-medium text-blue-100 uppercase">Total Permintaan</p>
@@ -23,7 +23,7 @@
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-sm font-medium text-yellow-100 uppercase">Menunggu</p>
@@ -39,7 +39,7 @@
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-sm font-medium text-green-100 uppercase">Disetujui</p>
@@ -55,7 +55,7 @@
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-sm font-medium text-red-100 uppercase">Ditolak</p>
@@ -79,12 +79,12 @@
             <div>
                 <h3 class="text-lg font-bold text-gray-800 flex items-center">
                     <i class="fas fa-list-alt text-blue-500 mr-2"></i>
-                    Permintaan Terbaru
+                    Permintaan Terbaru dari Petugas
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">5 permintaan terbaru yang masuk</p>
             </div>
             <a href="{{ route('admin.sarpras.permintaan-list') }}" 
-               class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center shadow-md transform hover:scale-105">
+               class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center shadow-md transform hover:scale-105 transition-all">
                 <i class="fas fa-th-list mr-2"></i>
                 Lihat Semua
             </a>
@@ -96,13 +96,19 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        ID
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Tanggal
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        Petugas
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Barang
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                        Jumlah
+                        Lokasi
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Status
@@ -116,9 +122,25 @@
                 @forelse ($permintaan_terbaru as $item)
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm font-bold text-gray-900">#{{ $item->id_item }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center text-sm text-gray-600">
                             <i class="far fa-calendar text-gray-400 mr-2"></i>
                             {{ $item->tanggal_permintaan->format('d/m/Y') }}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-2">
+                                <i class="fas fa-user text-green-600 text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $item->pengaduan->petugas->nama ?? 'N/A' }}
+                                </p>
+                                <p class="text-xs text-gray-500">Petugas</p>
+                            </div>
                         </div>
                     </td>
                     <td class="px-6 py-4">
@@ -127,14 +149,15 @@
                                 <i class="fas fa-box text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $item->nama_barang }}</p>
-                                <p class="text-xs text-gray-500">{{ Str::limit($item->spesifikasi ?? '-', 30) }}</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $item->nama_barang_baru }}</p>
+                                <p class="text-xs text-gray-500">{{ Str::limit($item->alasan_permintaan ?? '-', 30) }}</p>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-semibold rounded-full">
-                            {{ $item->jumlah }} unit
+                        <span class="text-sm text-gray-600 flex items-center">
+                            <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
+                            {{ Str::limit($item->lokasi_barang_baru, 20) }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -147,7 +170,7 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="{{ route('admin.sarpras.show-permintaan', $item->id_item) }}" 
+                        <a href="{{ route('admin.sarpras.show-permintaan', ['id' => $item->id_item]) }}" 
                            class="text-blue-600 hover:text-blue-900 inline-flex items-center font-medium">
                             <i class="fas fa-eye mr-1"></i>
                             Detail
@@ -156,7 +179,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center">
+                    <td colspan="7" class="px-6 py-12 text-center">
                         <i class="fas fa-inbox text-gray-300 text-5xl mb-4"></i>
                         <p class="text-gray-500 font-medium">Tidak ada permintaan terbaru</p>
                         <p class="text-gray-400 text-sm mt-2">Permintaan baru akan muncul di sini</p>

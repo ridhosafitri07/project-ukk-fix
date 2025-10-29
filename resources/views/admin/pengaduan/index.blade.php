@@ -99,6 +99,9 @@
                         Lokasi
                     </th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        Petugas
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Status
                     </th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
@@ -138,6 +141,24 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        @if($item->petugas)
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium text-gray-900 flex items-center">
+                                <i class="fas fa-user-cog text-green-500 mr-1 text-xs"></i>
+                                {{ Str::limit($item->petugas->nama, 20) }}
+                            </span>
+                            @if($item->petugas->pekerjaan)
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
+                                <i class="fas fa-briefcase mr-1"></i>
+                                {{ $item->petugas->pekerjaan }}
+                            </span>
+                            @endif
+                        </div>
+                        @else
+                        <span class="text-xs text-gray-400 italic">Belum ditugaskan</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                             @if($item->status === 'Diajukan') bg-yellow-100 text-yellow-800
                             @elseif($item->status === 'Disetujui') bg-green-100 text-green-800
@@ -158,7 +179,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center">
+                    <td colspan="8" class="px-6 py-12 text-center">
                         <i class="fas fa-inbox text-gray-300 text-5xl mb-4"></i>
                         <p class="text-gray-500 font-medium">Tidak ada pengaduan</p>
                         <p class="text-gray-400 text-sm mt-2">Pengaduan akan muncul di sini</p>

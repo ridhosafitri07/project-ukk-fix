@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\TemporaryItem;
 use App\Models\Pengaduan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SarprasController extends Controller
 {
@@ -16,7 +15,7 @@ class SarprasController extends Controller
             'menunggu_persetujuan' => TemporaryItem::where('status_permintaan', 'Menunggu Persetujuan')->count(),
             'disetujui' => TemporaryItem::where('status_permintaan', 'Disetujui')->count(),
             'ditolak' => TemporaryItem::where('status_permintaan', 'Ditolak')->count(),
-            'permintaan_terbaru' => TemporaryItem::with('pengaduan')
+            'permintaan_terbaru' => TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
                 ->orderBy('tanggal_permintaan', 'desc')
                 ->take(5)
                 ->get()
@@ -27,7 +26,7 @@ class SarprasController extends Controller
 
     public function permintaanList()
     {
-        $permintaan = TemporaryItem::with('pengaduan')
+        $permintaan = TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
             ->orderBy('tanggal_permintaan', 'desc')
             ->paginate(10);
 
@@ -36,7 +35,8 @@ class SarprasController extends Controller
 
     public function showPermintaan($id)
     {
-        $permintaan = TemporaryItem::with('pengaduan')->findOrFail($id);
+        $permintaan = TemporaryItem::with(['pengaduan', 'pengaduan.petugas', 'pengaduan.user'])
+            ->findOrFail($id);
         return view('admin.sarpras.show-permintaan', compact('permintaan'));
     }
 
@@ -53,21 +53,23 @@ class SarprasController extends Controller
         $permintaan->tanggal_persetujuan = now();
         $permintaan->save();
 
-        // Update status pengaduan terkait
-        $pengaduan = Pengaduan::find($permintaan->id_pengaduan);
-        if ($pengaduan) {
-            $pengaduan->status = $request->status === 'Disetujui' ? 'Diproses' : 'Ditolak';
-            $pengaduan->save();
+        // Jika disetujui, update status pengaduan terkait menjadi Diproses
+        if ($request->status === 'Disetujui' && $permintaan->id_pengaduan) {
+            $pengaduan = Pengaduan::find($permintaan->id_pengaduan);
+            if ($pengaduan && $pengaduan->status == 'Disetujui') {
+                $pengaduan->status = 'Diproses';
+                $pengaduan->save();
+            }
         }
 
         return redirect()
-            ->route('admin.sarpras.permintaan-list')
+            ->route('admin.sarpras.show-permintaan', ['id' => $id])
             ->with('success', 'Status permintaan berhasil diperbarui');
     }
 
     public function history()
     {
-        $history = TemporaryItem::with('pengaduan')
+        $history = TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
             ->whereIn('status_permintaan', ['Disetujui', 'Ditolak'])
             ->orderBy('tanggal_persetujuan', 'desc')
             ->paginate(10);
@@ -77,12 +79,10 @@ class SarprasController extends Controller
 
     public function exportHistory()
     {
-        $data = TemporaryItem::with('pengaduan')
+        $data = TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
             ->whereIn('status_permintaan', ['Disetujui', 'Ditolak'])
             ->orderBy('tanggal_persetujuan', 'desc')
             ->get();
-
-        // Logic untuk export ke Excel/PDF bisa ditambahkan di sini
 
         return back()->with('info', 'Fitur export akan segera tersedia');
     }

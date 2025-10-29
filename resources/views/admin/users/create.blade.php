@@ -55,6 +55,21 @@
                     @enderror
                 </div>
 
+                <!-- Pekerjaan Field (hanya muncul jika role petugas) -->
+                <div id="pekerjaan-field" style="display: none;">
+                    <label for="pekerjaan" class="block text-sm font-medium text-gray-700">Pekerjaan</label>
+                    <select name="pekerjaan" id="pekerjaan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Pilih Pekerjaan</option>
+                        <option value="CS" {{ old('pekerjaan') == 'CS' ? 'selected' : '' }}>Customer Service (CS)</option>
+                        <option value="Teknisi" {{ old('pekerjaan') == 'Teknisi' ? 'selected' : '' }}>Teknisi</option>
+                        <option value="Administrasi" {{ old('pekerjaan') == 'Administrasi' ? 'selected' : '' }}>Administrasi</option>
+                        <option value="Supervisor" {{ old('pekerjaan') == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
+                    </select>
+                    @error('pekerjaan')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="flex justify-end">
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                         <i class="fas fa-save mr-2"></i>Simpan
@@ -64,4 +79,29 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const pekerjaanField = document.getElementById('pekerjaan-field');
+    const pekerjaanSelect = document.getElementById('pekerjaan');
+    
+    function togglePekerjaanField() {
+        if (roleSelect.value === 'petugas') {
+            pekerjaanField.style.display = 'block';
+            pekerjaanSelect.required = true;
+        } else {
+            pekerjaanField.style.display = 'none';
+            pekerjaanSelect.required = false;
+            pekerjaanSelect.value = '';
+        }
+    }
+    
+    // Check on page load
+    togglePekerjaanField();
+    
+    // Check when role changes
+    roleSelect.addEventListener('change', togglePekerjaanField);
+});
+</script>
 @endsection

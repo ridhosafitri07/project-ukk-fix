@@ -43,7 +43,7 @@
                                         {{ $item->tanggal_permintaan->format('d/m/Y') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $item->nama_barang }}
+                                        {{ $item->nama_barang_baru ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
@@ -57,7 +57,7 @@
                                         {{ $item->tanggal_persetujuan ? $item->tanggal_persetujuan->format('d/m/Y') : '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.sarpras.show-permintaan', $item->id_item) }}" 
+                                        <a href="{{ route('admin.sarpras.show-permintaan', ['id' => $item->id_item]) }}" 
                                            class="text-indigo-600 hover:text-indigo-900">Detail</a>
                                     </td>
                                 </tr>

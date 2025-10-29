@@ -79,30 +79,46 @@
                         <i class="fas fa-history w-5"></i>
                         <span class="font-medium">Riwayat Pengaduan</span>
                     </a>
+
+                    <div class="my-4 border-t border-green-700"></div>
+
+                    <a href="{{ route('profile.index') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                        <i class="fas fa-user-circle w-5"></i>
+                        <span class="font-medium">Profil Saya</span>
+                    </a>
                 </div>
             </nav>
 
             <!-- User Profile Section -->
             <div class="p-4 border-t border-green-700">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-green-300 rounded-full flex items-center justify-center">
-                            <span class="text-green-800 font-bold text-sm">
-                                {{ strtoupper(substr(auth()->user()->nama_pengguna, 0, 2)) }}
-                            </span>
+                <a href="{{ route('profile.index') }}" class="block hover:bg-green-700 rounded-lg p-2 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            @if(auth()->user()->foto_profil)
+                                <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" 
+                                     alt="Profile" 
+                                     class="w-10 h-10 rounded-full object-cover border-2 border-green-300">
+                            @else
+                                <div class="w-10 h-10 bg-green-300 rounded-full flex items-center justify-center">
+                                    <span class="text-green-800 font-bold text-sm">
+                                        {{ strtoupper(substr(auth()->user()->nama_pengguna, 0, 2)) }}
+                                    </span>
+                                </div>
+                            @endif
+                            <div class="text-white">
+                                <p class="text-sm font-medium">{{ auth()->user()->nama_pengguna }}</p>
+                                <p class="text-xs text-green-200">Petugas</p>
+                            </div>
                         </div>
-                        <div class="text-white">
-                            <p class="text-sm font-medium">{{ auth()->user()->nama_pengguna }}</p>
-                            <p class="text-xs text-green-200">Petugas</p>
-                        </div>
+                        <form action="{{ route('logout') }}" method="POST" onclick="event.stopPropagation();">
+                            @csrf
+                            <button type="submit" class="text-green-200 hover:text-white" title="Logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </form>
                     </div>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-green-200 hover:text-white" title="Logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </form>
-                </div>
+                </a>
             </div>
         </aside>
 

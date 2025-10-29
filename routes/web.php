@@ -7,25 +7,14 @@ use App\Http\Controllers\SarprasController;
 use App\Http\Controllers\AdminPengaduanController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Petugas\PetugasController;
+use App\Http\Controllers\ProfileController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// Route untuk homepage tanpa middleware
+// Public routes
 Route::get('/', function () {
     if (auth()->check()) {
-        $role = auth()->user()->role;
-        return match ($role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'petugas' => redirect()->route('petugas.dashboard'),
-            'pengguna' => redirect()->route('pengguna.dashboard'),
-            default => redirect()->route('login')
-        };
+        return redirect('/dashboard');
     }
-    return redirect()->route('login');
+    return redirect('/login');
 });
 
 // Authentication Routes
@@ -36,23 +25,22 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+// Protected routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
-   Route::get('/dashboard', function () {
-        $user = auth()->user();
-        
-        if (!$user) {
-            return redirect()->route('login');
-        }
-
-        // Redirect langsung ke dashboard sesuai role
-        return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'petugas' => redirect()->route('petugas.dashboard'),
-            'pengguna' => redirect()->route('pengguna.dashboard'),
-            default => redirect()->route('login')
-        };
+    // Profile Routes (Untuk semua role)
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/update', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+        Route::delete('/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.delete-photo');
+    });
+    
+    // Dashboard router
+    Route::get('/dashboard', function () {
+        return redirect('/' . auth()->user()->role . '/dashboard');
     })->name('dashboard');
 
     // ===== ADMIN ROUTES =====
@@ -83,13 +71,18 @@ Route::middleware('auth')->group(function () {
     // ===== PETUGAS ROUTES =====
     Route::prefix('petugas')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':petugas'])->group(function () {
         // Dashboard
-        Route::get('/dashboard', [PetugasController::class, 'dashboard'])->name('petugas.dashboard');
+        Route::get('/dashboard', [PetugasController::class, 'dashboard'])
+            ->name('petugas.dashboard');
         
         // Pengaduan Management
         Route::prefix('pengaduan')->group(function () {
             Route::get('/', [PetugasController::class, 'pengaduanIndex'])->name('petugas.pengaduan.index');
             Route::get('/{pengaduan}', [PetugasController::class, 'pengaduanShow'])->name('petugas.pengaduan.show');
             Route::put('/{pengaduan}/status', [PetugasController::class, 'updateStatus'])->name('petugas.pengaduan.update-status');
+            
+            // Item Request Routes (BARU)
+            Route::get('/{pengaduan}/request-item', [PetugasController::class, 'showItemRequestForm'])->name('petugas.item-request.create');
+            Route::post('/{pengaduan}/request-item', [PetugasController::class, 'storeItemRequest'])->name('petugas.item-request.store');
         });
         
         // Riwayat

@@ -5,20 +5,19 @@ namespace App\Http\Controllers\Petugas;
 use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
 use App\Models\Petugas;
+use App\Models\TemporaryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PetugasController extends Controller
 {
     private function getPetugasId()
     {
         $user = Auth::user();
-        
-        // Cara 1: Cari petugas berdasarkan id_user (jika sudah ada kolom id_user di table petugas)
         $petugas = Petugas::where('id_user', $user->id_user)->first();
         
-        // Cara 2: Jika belum ada kolom id_user, cari berdasarkan nama
         if (!$petugas) {
             $petugas = Petugas::where('nama', $user->nama_pengguna)->first();
         }
@@ -31,12 +30,9 @@ class PetugasController extends Controller
         $petugasId = $this->getPetugasId();
         
         if (!$petugasId) {
-            // Logout dan redirect ke login dengan pesan error
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
+            return redirect()->back()->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
         }
         
-        // Get statistics - HANYA untuk petugas ini
         $totalTugas = Pengaduan::where('id_petugas', $petugasId)
             ->whereIn('status', ['Disetujui', 'Diproses', 'Selesai'])
             ->count();
@@ -55,11 +51,9 @@ class PetugasController extends Controller
             ->where('status', 'Disetujui')
             ->count();
         
-        // Calculate completion rate
         $totalAll = $tugasAktif + $tugasSelesai;
         $completionRate = $totalAll > 0 ? round(($tugasSelesai / $totalAll) * 100) : 0;
         
-        // Get recent tasks - HANYA untuk petugas ini
         $tugasTerbaru = Pengaduan::with('user')
             ->where('id_petugas', $petugasId)
             ->whereIn('status', ['Disetujui', 'Diproses'])
@@ -82,11 +76,9 @@ class PetugasController extends Controller
         $petugasId = $this->getPetugasId();
         
         if (!$petugasId) {
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
+            return redirect()->back()->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
         }
         
-        // Filter HANYA pengaduan untuk petugas ini
         $pengaduan = Pengaduan::with('user')
             ->where('id_petugas', $petugasId)
             ->whereIn('status', ['Disetujui', 'Diproses'])
@@ -112,13 +104,12 @@ class PetugasController extends Controller
     {
         $petugasId = $this->getPetugasId();
         
-        // Validasi: hanya bisa lihat pengaduan yang ditugaskan ke petugas ini
         if ($pengaduan->id_petugas != $petugasId) {
             return redirect()->route('petugas.pengaduan.index')
                 ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');
         }
         
-        $pengaduan->load('user');
+        $pengaduan->load(['user', 'temporary_items']);
         return view('petugas.pengaduan.show', compact('pengaduan'));
     }
     
@@ -126,7 +117,6 @@ class PetugasController extends Controller
     {
         $petugasId = $this->getPetugasId();
         
-        // Validasi: hanya bisa update pengaduan yang ditugaskan ke petugas ini
         if ($pengaduan->id_petugas != $petugasId) {
             return redirect()->route('petugas.pengaduan.index')
                 ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');
@@ -160,16 +150,80 @@ class PetugasController extends Controller
         }
     }
     
+    // ===== FITUR BARU: ITEM REQUEST =====
+    
+    public function showItemRequestForm(Pengaduan $pengaduan)
+    {
+        $petugasId = $this->getPetugasId();
+        
+        if ($pengaduan->id_petugas != $petugasId) {
+            return redirect()->route('petugas.pengaduan.index')
+                ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');
+        }
+        
+        return view('petugas.item-request.create', compact('pengaduan'));
+    }
+    
+    public function storeItemRequest(Request $request, Pengaduan $pengaduan)
+    {
+        $petugasId = $this->getPetugasId();
+        
+        if ($pengaduan->id_petugas != $petugasId) {
+            return redirect()->route('petugas.pengaduan.index')
+                ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');
+        }
+        
+        $request->validate([
+            'nama_barang_baru' => 'required|string|max:200',
+            'lokasi_barang_baru' => 'required|string|max:200',
+            'alasan_permintaan' => 'required|string',
+            'foto_kerusakan' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+        
+        DB::beginTransaction();
+        try {
+            // Upload foto
+            $fotoPath = null;
+            if ($request->hasFile('foto_kerusakan')) {
+                $fotoPath = $request->file('foto_kerusakan')->store('public/item-requests');
+                $fotoPath = str_replace('public/', '', $fotoPath);
+            }
+            
+            // Create item request
+            TemporaryItem::create([
+                'id_pengaduan' => $pengaduan->id_pengaduan,
+                'id_petugas' => $petugasId,
+                'nama_barang_baru' => $request->nama_barang_baru,
+                'lokasi_barang_baru' => $request->lokasi_barang_baru,
+                'alasan_permintaan' => $request->alasan_permintaan,
+                'foto_kerusakan' => $fotoPath,
+                'status_permintaan' => 'Menunggu Persetujuan',
+                'tanggal_permintaan' => now()
+            ]);
+            
+            DB::commit();
+            return redirect()
+                ->route('petugas.pengaduan.show', $pengaduan)
+                ->with('success', 'Permintaan barang berhasil diajukan dan menunggu persetujuan admin');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($fotoPath) {
+                Storage::delete('public/' . $fotoPath);
+            }
+            return back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+    
     public function riwayatIndex()
     {
         $petugasId = $this->getPetugasId();
         
         if (!$petugasId) {
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
+            return redirect()->back()->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
         }
         
-        // Filter HANYA riwayat untuk petugas ini
         $riwayat = Pengaduan::with('user')
             ->where('id_petugas', $petugasId)
             ->where('status', 'Selesai')
@@ -183,7 +237,6 @@ class PetugasController extends Controller
     {
         $petugasId = $this->getPetugasId();
         
-        // Validasi
         if ($pengaduan->id_petugas != $petugasId) {
             return redirect()->route('petugas.riwayat.index')
                 ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');

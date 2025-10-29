@@ -151,8 +151,11 @@
                                         <option value="">-- Pilih Petugas --</option>
                                         @forelse($petugasList as $petugas)
                                         <option value="{{ $petugas->id_petugas }}" 
-                                                data-info="{{ $petugas->nama_pengguna }} - {{ $petugas->gender }} - {{ $petugas->telp }}">
-                                            {{ $petugas->nama_pengguna }} ({{ $petugas->nama }})
+                                                data-nama="{{ $petugas->nama_pengguna }}"
+                                                data-gender="{{ $petugas->gender }}"
+                                                data-telp="{{ $petugas->telp }}"
+                                                data-pekerjaan="{{ $petugas->pekerjaan ?? 'Tidak Ditentukan' }}">
+                                            {{ $petugas->nama_pengguna }} - {{ $petugas->pekerjaan ?? 'Tidak Ditentukan' }}
                                         </option>
                                         @empty
                                         <option value="" disabled>Tidak ada petugas yang tersedia</option>
@@ -223,11 +226,24 @@
                     @if($pengaduan->id_petugas && $pengaduan->petugas)
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Petugas yang Ditugaskan</dt>
-                        <dd class="mt-1 text-sm text-gray-900 flex items-center">
-                            <i class="fas fa-user-hard-hat text-green-500 mr-2"></i>
-                            {{ $pengaduan->petugas->nama }}
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-hard-hat text-green-500 mr-2"></i>
+                                <span class="font-semibold">{{ $pengaduan->petugas->nama }}</span>
+                            </div>
+                            @if($pengaduan->petugas->pekerjaan)
+                            <div class="flex items-center mt-1 ml-6">
+                                <i class="fas fa-briefcase text-blue-500 mr-2 text-xs"></i>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                                    {{ $pengaduan->petugas->pekerjaan }}
+                                </span>
+                            </div>
+                            @endif
                             @if($pengaduan->petugas->telp)
-                            <span class="ml-2 text-gray-500">- {{ $pengaduan->petugas->telp }}</span>
+                            <div class="flex items-center mt-1 ml-6">
+                                <i class="fas fa-phone text-gray-400 mr-2 text-xs"></i>
+                                <span class="text-xs text-gray-600">{{ $pengaduan->petugas->telp }}</span>
+                            </div>
                             @endif
                         </dd>
                     </div>
@@ -395,20 +411,28 @@ document.addEventListener('DOMContentLoaded', function() {
     petugasSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         if (this.value) {
-            const petugasData = selectedOption.dataset.info.split(' - ');
+            const nama = selectedOption.dataset.nama;
+            const gender = selectedOption.dataset.gender === 'L' ? 'Laki-laki' : 'Perempuan';
+            const telp = selectedOption.dataset.telp;
+            const pekerjaan = selectedOption.dataset.pekerjaan;
+            
             petugasDetail.innerHTML = `
                 <div class="flex items-center text-gray-700">
                     <i class="fas fa-user mr-2 text-blue-500"></i>
-                    <span class="font-medium">${petugasData[0]}</span>
+                    <span class="font-medium">${nama}</span>
                 </div>
                 <div class="flex items-center text-gray-700">
-                    <i class="fas fa-venus-mars mr-2 text-blue-500"></i>
-                    <span>${petugasData[1]}</span>
+                    <i class="fas fa-briefcase mr-2 text-green-500"></i>
+                    <span class="font-semibold text-green-700">${pekerjaan}</span>
                 </div>
-                ${petugasData[2] ? `
                 <div class="flex items-center text-gray-700">
-                    <i class="fas fa-phone mr-2 text-blue-500"></i>
-                    <span>${petugasData[2]}</span>
+                    <i class="fas fa-venus-mars mr-2 text-purple-500"></i>
+                    <span>${gender}</span>
+                </div>
+                ${telp ? `
+                <div class="flex items-center text-gray-700">
+                    <i class="fas fa-phone mr-2 text-orange-500"></i>
+                    <span>${telp}</span>
                 </div>
                 ` : ''}
             `;

@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::with('petugas');
         
         // Filter by role if requested
         if ($request->filled('role') && $request->role !== 'all') {
@@ -53,6 +53,7 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:user',
             'password' => 'required|string|min:6',
             'role' => ['required', Rule::in(['admin', 'petugas', 'pengguna'])],
+            'pekerjaan' => 'required_if:role,petugas|in:CS,Teknisi,Administrasi,Supervisor',
         ], [
             'nama_pengguna.required' => 'Nama lengkap wajib diisi',
             'username.required' => 'Username wajib diisi',
@@ -60,14 +61,25 @@ class UserController extends Controller
             'password.required' => 'Password wajib diisi',
             'password.min' => 'Password minimal 6 karakter',
             'role.required' => 'Role wajib dipilih',
+            'pekerjaan.required_if' => 'Pekerjaan wajib diisi untuk petugas',
         ]);
 
-        User::create([
+        $user = User::create([
             'nama_pengguna' => $validated['nama_pengguna'],
             'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
         ]);
+
+        // Jika role adalah petugas, buat data petugas
+        if ($validated['role'] === 'petugas') {
+            $user->petugas()->create([
+                'nama' => $validated['nama_pengguna'],
+                'gender' => 'L', // Default value
+                'telp' => '', // Default value
+                'pekerjaan' => $validated['pekerjaan'],
+            ]);
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil ditambahkan');
@@ -75,6 +87,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        $user->load('petugas');
         return view('admin.users.edit', compact('user'));
     }
 
@@ -85,12 +98,14 @@ class UserController extends Controller
             'username' => ['required', 'string', 'max:255', Rule::unique('user')->ignore($user->id_user, 'id_user')],
             'password' => 'nullable|string|min:6',
             'role' => ['required', Rule::in(['admin', 'petugas', 'pengguna'])],
+            'pekerjaan' => 'required_if:role,petugas|in:CS,Teknisi,Administrasi,Supervisor',
         ], [
             'nama_pengguna.required' => 'Nama lengkap wajib diisi',
             'username.required' => 'Username wajib diisi',
             'username.unique' => 'Username sudah digunakan',
             'password.min' => 'Password minimal 6 karakter',
             'role.required' => 'Role wajib dipilih',
+            'pekerjaan.required_if' => 'Pekerjaan wajib diisi untuk petugas',
         ]);
 
         $user->nama_pengguna = $validated['nama_pengguna'];
@@ -100,6 +115,26 @@ class UserController extends Controller
         }
         $user->role = $validated['role'];
         $user->save();
+
+        // Jika role adalah petugas
+        if ($validated['role'] === 'petugas') {
+            // Cek apakah sudah ada data petugas
+            if ($user->petugas) {
+                // Update data petugas
+                $user->petugas->update([
+                    'nama' => $validated['nama_pengguna'],
+                    'pekerjaan' => $validated['pekerjaan'],
+                ]);
+            } else {
+                // Buat data petugas baru
+                $user->petugas()->create([
+                    'nama' => $validated['nama_pengguna'],
+                    'gender' => 'L', // Default value
+                    'telp' => '', // Default value
+                    'pekerjaan' => $validated['pekerjaan'],
+                ]);
+            }
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil diperbarui');

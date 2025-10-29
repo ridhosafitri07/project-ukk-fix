@@ -42,7 +42,7 @@
                         Barang
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                        Spesifikasi
+                        Lokasi
                     </th>
                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Jumlah
@@ -73,16 +73,16 @@
                                 <i class="fas fa-box text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $item->nama_barang }}</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $item->nama_barang_baru ?? '-' }}</p>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-sm text-gray-600">{{ Str::limit($item->spesifikasi ?? '-', 30) }}</span>
+                        <span class="text-sm text-gray-600">{{ Str::limit($item->lokasi_barang_baru ?? '-', 30) }}</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-semibold rounded-full">
-                            {{ $item->jumlah }} unit
+                            unit
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -95,7 +95,7 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{{ route('admin.sarpras.show-permintaan', $item->id_item) }}" 
+                        <a href="{{ route('admin.sarpras.show-permintaan', ['id' => $item->id_item]) }}" 
                            class="text-blue-600 hover:text-blue-900 inline-flex items-center">
                             <i class="fas fa-eye mr-1"></i>
                             Detail

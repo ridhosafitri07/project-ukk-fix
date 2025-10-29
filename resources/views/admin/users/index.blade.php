@@ -164,13 +164,21 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            @if($user->role == 'admin') bg-purple-100 text-purple-800
-                            @elseif($user->role == 'petugas') bg-green-100 text-green-800
-                            @else bg-blue-100 text-blue-800 @endif">
-                            <i class="fas fa-{{ $user->role == 'admin' ? 'user-shield' : ($user->role == 'petugas' ? 'user-cog' : 'user') }} mr-1"></i>
-                            {{ ucfirst($user->role) }}
-                        </span>
+                        <div class="flex flex-col">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                @if($user->role == 'admin') bg-purple-100 text-purple-800
+                                @elseif($user->role == 'petugas') bg-green-100 text-green-800
+                                @else bg-blue-100 text-blue-800 @endif">
+                                <i class="fas fa-{{ $user->role == 'admin' ? 'user-shield' : ($user->role == 'petugas' ? 'user-cog' : 'user') }} mr-1"></i>
+                                {{ ucfirst($user->role) }}
+                            </span>
+                            @if($user->role == 'petugas' && $user->petugas)
+                            <span class="mt-1 text-xs text-gray-600 flex items-center">
+                                <i class="fas fa-briefcase mr-1"></i>
+                                {{ $user->petugas->pekerjaan }}
+                            </span>
+                            @endif
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <i class="far fa-calendar text-gray-400 mr-2"></i>

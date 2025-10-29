@@ -23,7 +23,10 @@ class User extends Authenticatable
         'username',
         'password',
         'nama_pengguna',
-        'role'
+        'role',
+        'foto_profil',
+        'bio',
+        'telp_user'
     ];
 
     const ROLE_ADMIN = 'admin';
@@ -53,5 +56,10 @@ class User extends Authenticatable
     public function pengaduans()
     {
         return $this->hasMany(Pengaduan::class, 'id_user', 'id_user');
+    }
+
+    public function petugas()
+    {
+        return $this->hasOne(Petugas::class, 'id_user', 'id_user');
     }
 }

@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') - SAPRAS</title>
+    <title>@yield('title', 'Dashboard') - SAPRAS Pengguna</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -24,24 +22,22 @@
             background: #555;
         }
         
-        /* Smooth transitions */
         * {
             transition: all 0.3s ease;
         }
         
-        /* Sidebar active state */
         .sidebar-link.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
         }
         
         .sidebar-link:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(59, 130, 246, 0.1);
             transform: translateX(5px);
         }
         
         .sidebar-link.active:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             transform: translateX(5px);
         }
     </style>
@@ -49,16 +45,16 @@
 <body class="bg-gray-50">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-blue-600 to-blue-800 shadow-2xl z-50 flex flex-col">
+        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl z-50 flex flex-col">
             <!-- Logo Section -->
-            <div class="p-6 border-b border-blue-700">
+            <div class="p-6 border-b border-blue-600">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                        <i class="fas fa-tools text-blue-600 text-xl"></i>
+                        <i class="fas fa-user text-blue-600 text-xl"></i>
                     </div>
                     <div>
                         <h1 class="text-white text-xl font-bold">SAPRAS</h1>
-                        <p class="text-blue-200 text-xs">Manajemen Sarpras</p>
+                        <p class="text-blue-200 text-xs">Panel Pengguna</p>
                     </div>
                 </div>
             </div>
@@ -66,31 +62,19 @@
             <!-- Menu Section -->
             <nav class="flex-1 overflow-y-auto py-6 px-3">
                 <div class="space-y-2">
-                    <a href="{{ route('admin.dashboard') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('pengguna.dashboard') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('pengguna.dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home w-5"></i>
                         <span class="font-medium">Dashboard</span>
                     </a>
 
-                    <a href="{{ route('admin.pengaduan.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.pengaduan.*') ? 'active' : '' }}">
+                    <a href="{{ route('pengaduan.index') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('pengaduan.*') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-list w-5"></i>
-                        <span class="font-medium">Pengaduan</span>
+                        <span class="font-medium">Pengaduan Saya</span>
                     </a>
 
-                    <a href="{{ route('admin.sarpras.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.sarpras.*') ? 'active' : '' }}">
-                        <i class="fas fa-boxes w-5"></i>
-                        <span class="font-medium">Manajemen Sarpras</span>
-                    </a>
-
-                    <a href="{{ route('admin.users.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                        <i class="fas fa-users w-5"></i>
-                        <span class="font-medium">Users</span>
-                    </a>
-
-                    <div class="my-4 border-t border-blue-700"></div>
+                    <div class="my-4 border-t border-blue-600"></div>
 
                     <a href="{{ route('profile.index') }}" 
                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('profile.*') ? 'active' : '' }}">
@@ -101,8 +85,8 @@
             </nav>
 
             <!-- User Profile Section -->
-            <div class="p-4 border-t border-blue-700">
-                <a href="{{ route('profile.index') }}" class="block hover:bg-blue-700 rounded-lg p-2 transition-colors">
+            <div class="p-4 border-t border-blue-600">
+                <a href="{{ route('profile.index') }}" class="block hover:bg-blue-600 rounded-lg p-2 transition-colors">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             @if(auth()->user()->foto_profil)
@@ -118,7 +102,7 @@
                             @endif
                             <div class="text-white">
                                 <p class="text-sm font-medium">{{ auth()->user()->nama_pengguna }}</p>
-                                <p class="text-xs text-blue-200">{{ ucfirst(auth()->user()->role) }}</p>
+                                <p class="text-xs text-blue-200">Pengguna</p>
                             </div>
                         </div>
                         <form action="{{ route('logout') }}" method="POST" onclick="event.stopPropagation();">

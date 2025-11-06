@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\Pengaduan;
 use App\Models\TemporaryItem;
+use App\Models\Lokasi;
+use App\Models\ListLokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +21,11 @@ class DashboardController extends Controller
         $totalItems = Item::count();
         $totalPengaduan = Pengaduan::count();
         $pendingItems = TemporaryItem::where('status_permintaan', 'Menunggu Persetujuan')->count();
+
+        // Manajemen Sarpras Statistics
+        $totalLokasi = Lokasi::count();
+        $totalBarang = Item::count();
+        $totalRelasi = ListLokasi::count();
 
         // Get monthly pengaduan statistics
         $pengaduanStats = Pengaduan::select(
@@ -79,7 +86,10 @@ class DashboardController extends Controller
             'pendingItems',
             'pengaduanStats',
             'itemStats',
-            'recentActivities'
+            'recentActivities',
+            'totalLokasi',
+            'totalBarang',
+            'totalRelasi'
         ));
     }
 }

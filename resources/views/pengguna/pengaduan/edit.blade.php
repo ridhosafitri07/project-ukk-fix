@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Pengaduan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <nav class="bg-white shadow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -74,14 +75,40 @@
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             value="{{ old('nama_pengaduan', $pengaduan->nama_pengaduan) }}"
                             placeholder="Masukkan judul pengaduan">
+                        @error('nama_pengaduan')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
-                        <label for="lokasi" class="block text-sm font-medium text-gray-700">Lokasi</label>
-                        <input type="text" name="lokasi" id="lokasi" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            value="{{ old('lokasi', $pengaduan->lokasi) }}"
-                            placeholder="Masukkan lokasi sarana/prasarana">
+                        <label for="id_lokasi" class="block text-sm font-medium text-gray-700">Lokasi</label>
+                        <select name="id_lokasi" id="id_lokasi" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">-- Pilih Lokasi --</option>
+                            @foreach($lokasis as $lokasi)
+                                <option value="{{ $lokasi->id_lokasi }}" 
+                                    {{ (old('id_lokasi', $currentLokasi->id_lokasi ?? null) == $lokasi->id_lokasi) ? 'selected' : '' }}>
+                                    {{ $lokasi->nama_lokasi }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_lokasi')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="id_item" class="block text-sm font-medium text-gray-700">Item/Barang</label>
+                        <select name="id_item" id="id_item" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">-- Pilih lokasi terlebih dahulu --</option>
+                            @if($pengaduan->id_item && $pengaduan->item)
+                                <option value="{{ $pengaduan->item->id_item }}" selected>{{ $pengaduan->item->nama_item }}</option>
+                            @endif
+                        </select>
+                        @error('id_item')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -89,6 +116,9 @@
                         <textarea name="deskripsi" id="deskripsi" rows="4" required
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Jelaskan detail pengaduan Anda">{{ old('deskripsi', $pengaduan->deskripsi) }}</textarea>
+                        @error('deskripsi')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -103,6 +133,9 @@
                             class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                             accept="image/*">
                         <p class="mt-1 text-sm text-gray-500">Format: JPG, JPEG, PNG (Max. 2MB). Biarkan kosong jika tidak ingin mengubah foto.</p>
+                        @error('foto')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex justify-between">
@@ -123,5 +156,80 @@
             </div>
         </div>
     </main>
+
+    <script>
+        // Handle lokasi change untuk load items
+        document.getElementById('id_lokasi').addEventListener('change', function() {
+            const lokasiId = this.value;
+            const itemSelect = document.getElementById('id_item');
+            
+            // Reset dan disable item select
+            itemSelect.innerHTML = '<option value="">⏳ Memuat data...</option>';
+            itemSelect.disabled = true;
+            
+            if (!lokasiId) {
+                itemSelect.innerHTML = '<option value="">-- Pilih lokasi terlebih dahulu --</option>';
+                return;
+            }
+            
+            // URL yang benar sesuai dengan route
+            const url = `{{ route('api.lokasi.items', ['id_lokasi' => ':id']) }}`.replace(':id', lokasiId);
+            
+            console.log('🔍 Fetching URL:', url);
+            console.log('📍 Lokasi ID:', lokasiId);
+            
+            // Fetch items berdasarkan lokasi
+            fetch(url)
+                .then(response => {
+                    console.log('📡 Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('✅ Data received:', data);
+                    
+                    if (data.success && data.items && data.items.length > 0) {
+                        itemSelect.innerHTML = '<option value="">-- Pilih Item/Barang --</option>';
+                        data.items.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id_item;
+                            option.textContent = `📦 ${item.nama_item}`;
+                            // Restore selection if editing
+                            @if($pengaduan->id_item)
+                            if (item.id_item == {{ $pengaduan->id_item }}) {
+                                option.selected = true;
+                            }
+                            @endif
+                            itemSelect.appendChild(option);
+                        });
+                        itemSelect.disabled = false;
+                        itemSelect.classList.remove('border-red-300', 'border-orange-300');
+                        itemSelect.classList.add('border-green-300');
+                        console.log('✅ Items loaded:', data.items.length);
+                    } else {
+                        itemSelect.innerHTML = '<option value="">ℹ️ Tidak ada item di lokasi ini</option>';
+                        itemSelect.disabled = true;
+                        itemSelect.classList.add('border-orange-300');
+                        console.log('ℹ️ No items found');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error details:', error);
+                    itemSelect.innerHTML = '<option value="">⚠️ Gagal memuat data - Silakan coba lagi</option>';
+                    itemSelect.disabled = true;
+                    itemSelect.classList.add('border-red-300');
+                });
+        });
+
+        // Trigger change event on page load if lokasi is already selected
+        window.addEventListener('DOMContentLoaded', function() {
+            const lokasiSelect = document.getElementById('id_lokasi');
+            if (lokasiSelect.value) {
+                lokasiSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
 </body>
 </html>

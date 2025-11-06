@@ -64,6 +64,42 @@ Route::middleware('auth')->group(function () {
             Route::get('/history/export', [SarprasController::class, 'exportHistory'])->name('admin.sarpras.export-history');
         });
 
+        // Master Data - Manajemen Sarpras
+        Route::prefix('master-lokasi')->name('admin.master-lokasi.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\LokasiController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\LokasiController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\LokasiController::class, 'store'])->name('store');
+            Route::get('/{masterLokasi}', [\App\Http\Controllers\Admin\LokasiController::class, 'show'])->name('show');
+            Route::get('/{masterLokasi}/edit', [\App\Http\Controllers\Admin\LokasiController::class, 'edit'])->name('edit');
+            Route::put('/{masterLokasi}', [\App\Http\Controllers\Admin\LokasiController::class, 'update'])->name('update');
+            Route::delete('/{masterLokasi}', [\App\Http\Controllers\Admin\LokasiController::class, 'destroy'])->name('destroy');
+            Route::get('/{masterLokasi}/export-pdf', [\App\Http\Controllers\Admin\LokasiController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/{masterLokasi}/export-excel', [\App\Http\Controllers\Admin\LokasiController::class, 'exportExcel'])->name('export-excel');
+        });
+
+        Route::prefix('master-barang')->name('admin.master-barang.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\BarangController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\BarangController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\BarangController::class, 'store'])->name('store');
+            Route::get('/{masterBarang}/edit', [\App\Http\Controllers\Admin\BarangController::class, 'edit'])->name('edit');
+            Route::put('/{masterBarang}', [\App\Http\Controllers\Admin\BarangController::class, 'update'])->name('update');
+            Route::delete('/{masterBarang}', [\App\Http\Controllers\Admin\BarangController::class, 'destroy'])->name('destroy');
+            Route::get('/export-pdf', [\App\Http\Controllers\Admin\BarangController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-excel', [\App\Http\Controllers\Admin\BarangController::class, 'exportExcel'])->name('export-excel');
+        });
+
+        Route::prefix('relasi')->name('admin.relasi.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\RelasiController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\RelasiController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\RelasiController::class, 'store'])->name('store');
+            Route::get('/{relasi}/edit', [\App\Http\Controllers\Admin\RelasiController::class, 'edit'])->name('edit');
+            Route::put('/{relasi}', [\App\Http\Controllers\Admin\RelasiController::class, 'update'])->name('update');
+            Route::delete('/{relasi}', [\App\Http\Controllers\Admin\RelasiController::class, 'destroy'])->name('destroy');
+            Route::post('/bulk-delete', [\App\Http\Controllers\Admin\RelasiController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::get('/export-pdf', [\App\Http\Controllers\Admin\RelasiController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-excel', [\App\Http\Controllers\Admin\RelasiController::class, 'exportExcel'])->name('export-excel');
+        });
+
         // User Management Routes
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class, ['as' => 'admin']);
     });
@@ -120,5 +156,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengaduan/{pengaduan}/edit', [PengaduanController::class, 'edit'])->name('pengaduan.edit');
         Route::put('/pengaduan/{pengaduan}', [PengaduanController::class, 'update'])->name('pengaduan.update');
         Route::delete('/pengaduan/{pengaduan}', [PengaduanController::class, 'destroy'])->name('pengaduan.destroy');
+        
+        // API route untuk mendapatkan items berdasarkan lokasi
+        Route::get('/api/lokasi/{id_lokasi}/items', [PengaduanController::class, 'getItemsByLokasi'])->name('api.lokasi.items');
     });
 });

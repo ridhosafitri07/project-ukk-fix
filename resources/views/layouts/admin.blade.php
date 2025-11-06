@@ -6,7 +6,9 @@
     <title>@yield('title', 'Dashboard') - SAPRAS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -78,11 +80,51 @@
                         <span class="font-medium">Pengaduan</span>
                     </a>
 
-                    <a href="{{ route('admin.sarpras.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.sarpras.*') ? 'active' : '' }}">
-                        <i class="fas fa-boxes w-5"></i>
-                        <span class="font-medium">Manajemen Sarpras</span>
-                    </a>
+                    <!-- Dropdown Menu: Manajemen Sarpras -->
+                    <div x-data="{ open: {{ request()->routeIs('admin.sarpras.*') || request()->routeIs('admin.master-*') ? 'true' : 'false' }} }">
+                        <button @click="open = !open" 
+                                class="sidebar-link flex items-center justify-between w-full px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.sarpras.*') || request()->routeIs('admin.master-*') ? 'active' : '' }}">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-boxes w-5"></i>
+                                <span class="font-medium">Manajemen Sarpras</span>
+                            </div>
+                            <i class="fas fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        
+                        <div x-show="open" x-collapse class="ml-4 mt-2 space-y-1">
+                            <a href="{{ route('admin.sarpras.index') }}" 
+                               class="flex items-center space-x-3 px-4 py-2 rounded-lg text-blue-100 hover:bg-blue-700 hover:text-white transition {{ request()->routeIs('admin.sarpras.index') || request()->routeIs('admin.sarpras.permintaan-list') || request()->routeIs('admin.sarpras.show-permintaan') ? 'bg-blue-700 text-white' : '' }}">
+                                <i class="fas fa-clipboard-check w-4 text-sm"></i>
+                                <span class="text-sm">Daftar Permintaan</span>
+                            </a>
+                            
+                            <a href="{{ route('admin.sarpras.history') }}" 
+                               class="flex items-center space-x-3 px-4 py-2 rounded-lg text-blue-100 hover:bg-blue-700 hover:text-white transition {{ request()->routeIs('admin.sarpras.history') ? 'bg-blue-700 text-white' : '' }}">
+                                <i class="fas fa-history w-4 text-sm"></i>
+                                <span class="text-sm">Riwayat</span>
+                            </a>
+
+                            <div class="my-2 border-t border-blue-700"></div>
+                            
+                            <a href="{{ route('admin.master-lokasi.index') }}" 
+                               class="flex items-center space-x-3 px-4 py-2 rounded-lg text-blue-100 hover:bg-blue-700 hover:text-white transition {{ request()->routeIs('admin.master-lokasi.*') ? 'bg-blue-700 text-white' : '' }}">
+                                <i class="fas fa-map-marker-alt w-4 text-sm"></i>
+                                <span class="text-sm">Master Lokasi/Ruangan</span>
+                            </a>
+                            
+                            <a href="{{ route('admin.master-barang.index') }}" 
+                               class="flex items-center space-x-3 px-4 py-2 rounded-lg text-blue-100 hover:bg-blue-700 hover:text-white transition {{ request()->routeIs('admin.master-barang.*') ? 'bg-blue-700 text-white' : '' }}">
+                                <i class="fas fa-box w-4 text-sm"></i>
+                                <span class="text-sm">Master Barang/Item</span>
+                            </a>
+                            
+                            <a href="{{ route('admin.relasi.index') }}" 
+                               class="flex items-center space-x-3 px-4 py-2 rounded-lg text-blue-100 hover:bg-blue-700 hover:text-white transition {{ request()->routeIs('admin.relasi.*') ? 'bg-blue-700 text-white' : '' }}">
+                                <i class="fas fa-link w-4 text-sm"></i>
+                                <span class="text-sm">Relasi Barang-Ruangan</span>
+                            </a>
+                        </div>
+                    </div>
 
                     <a href="{{ route('admin.users.index') }}" 
                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
@@ -193,6 +235,34 @@
             </footer>
         </div>
     </div>
+
+    <!-- SweetAlert2 for Flash Messages -->
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            toast: true,
+            position: 'top-end'
+        });
+    </script>
+    @endif
+
+    @if(session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ session('error') }}',
+            showConfirmButton: true,
+            confirmButtonColor: '#EF4444'
+        });
+    </script>
+    @endif
 
     @stack('scripts')
 </body>

@@ -76,6 +76,63 @@
     </div>
 </div>
 
+<!-- Manajemen Sarpras Section -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+            <i class="fas fa-boxes text-purple-600 mr-2"></i>
+            Manajemen Sarana & Prasarana
+        </h2>
+        <a href="{{ route('admin.master-lokasi.index') }}" class="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center">
+            Kelola <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- Total Lokasi -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 font-medium">Total Lokasi</p>
+                    <p class="text-4xl font-bold mt-2">{{ $totalLokasi ?? 0 }}</p>
+                    <p class="text-xs opacity-75 mt-2">Ruangan terdaftar</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-4">
+                    <i class="fas fa-map-marked-alt text-3xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Barang -->
+        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 font-medium">Total Barang</p>
+                    <p class="text-4xl font-bold mt-2">{{ $totalBarang ?? 0 }}</p>
+                    <p class="text-xs opacity-75 mt-2">Item terdaftar</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-4">
+                    <i class="fas fa-cube text-3xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Relasi -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm opacity-90 font-medium">Total Relasi</p>
+                    <p class="text-4xl font-bold mt-2">{{ $totalRelasi ?? 0 }}</p>
+                    <p class="text-xs opacity-75 mt-2">Barang terdistribusi</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-4">
+                    <i class="fas fa-link text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Section -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     <!-- Pengaduan Chart -->

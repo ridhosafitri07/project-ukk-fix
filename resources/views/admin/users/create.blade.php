@@ -46,7 +46,6 @@
                     <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
                     <select name="role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                         <option value="">Pilih Role</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="petugas" {{ old('role') == 'petugas' ? 'selected' : '' }}>Petugas</option>
                         <option value="pengguna" {{ old('role') == 'pengguna' ? 'selected' : '' }}>Pengguna</option>
                     </select>

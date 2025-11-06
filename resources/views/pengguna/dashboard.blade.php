@@ -1,178 +1,193 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siswa Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold">SAPRAS</h1>
-                    </div>
+@extends('layouts.pengguna')
+
+@section('title', 'Dashboard')
+@section('header', 'Dashboard Siswa')
+@section('subheader', 'Selamat datang! Kelola pengaduan sarana prasarana sekolah Anda')
+
+@section('content')
+<div class="space-y-6">
+    <!-- Welcome Card -->
+    <div class="bg-gradient-to-r from-blue-500 to-sky-600 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+        <div class="relative z-10">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold mb-2">Halo, {{ auth()->user()->nama_pengguna }}! 👋</h1>
+                    <p class="text-blue-100 mb-6">Laporkan masalah sarana dan prasarana di sekolah dengan mudah</p>
+                    <a href="{{ route('pengaduan.create') }}" 
+                       class="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Buat Pengaduan Baru
+                    </a>
                 </div>
-                <div class="flex items-center">
-                    <div class="ml-3 relative">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-gray-700">{{ auth()->user()->nama_pengguna }}</span>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800">Logout</button>
-                            </form>
-                        </div>
+                <div class="hidden lg:block">
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-clipboard-list text-6xl text-white/80"></i>
                     </div>
                 </div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl font-bold text-gray-900">Dashboard Siswa</h2>
-        </div>
-    </header>
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total Pengaduan -->
+        <a href="{{ route('pengaduan.index') }}" 
+           class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:scale-105 border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-clipboard-list text-white text-xl"></i>
+                </div>
+                <span class="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Semua</span>
+            </div>
+            <div class="mb-1">
+                <p class="text-3xl font-bold text-slate-800">{{ $totalPengaduan ?? 0 }}</p>
+            </div>
+            <p class="text-sm text-slate-600 font-medium">Total Pengaduan</p>
+            <div class="mt-3 flex items-center text-blue-600 text-sm font-semibold">
+                <span>Lihat Detail</span>
+                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            </div>
+        </a>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="mb-8 flex justify-end">
-                <a href="{{ route('pengaduan.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Buat Pengaduan Baru
+        <!-- Selesai -->
+        <a href="{{ route('pengaduan.index', ['status' => 'Selesai']) }}" 
+           class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:scale-105 border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-check-circle text-white text-xl"></i>
+                </div>
+                <span class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">Selesai</span>
+            </div>
+            <div class="mb-1">
+                <p class="text-3xl font-bold text-slate-800">{{ $selesaiCount ?? 0 }}</p>
+            </div>
+            <p class="text-sm text-slate-600 font-medium">Pengaduan Selesai</p>
+            <div class="mt-3 flex items-center text-emerald-600 text-sm font-semibold">
+                <span>Lihat Detail</span>
+                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            </div>
+        </a>
+
+        <!-- Dalam Proses -->
+        <a href="{{ route('pengaduan.index', ['status' => 'Diproses']) }}" 
+           class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:scale-105 border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-cog fa-spin text-white text-xl"></i>
+                </div>
+                <span class="text-xs font-semibold px-3 py-1 bg-amber-100 text-amber-700 rounded-full">Proses</span>
+            </div>
+            <div class="mb-1">
+                <p class="text-3xl font-bold text-slate-800">{{ $prosesCount ?? 0 }}</p>
+            </div>
+            <p class="text-sm text-slate-600 font-medium">Dalam Proses</p>
+            <div class="mt-3 flex items-center text-amber-600 text-sm font-semibold">
+                <span>Lihat Detail</span>
+                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            </div>
+        </a>
+
+        <!-- Menunggu -->
+        <a href="{{ route('pengaduan.index', ['status' => 'Diajukan']) }}" 
+           class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:scale-105 border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-clock text-white text-xl"></i>
+                </div>
+                <span class="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-700 rounded-full">Menunggu</span>
+            </div>
+            <div class="mb-1">
+                <p class="text-3xl font-bold text-slate-800">{{ $diajukanCount ?? 0 }}</p>
+            </div>
+            <p class="text-sm text-slate-600 font-medium">Menunggu Verifikasi</p>
+            <div class="mt-3 flex items-center text-slate-600 text-sm font-semibold">
+                <span>Lihat Detail</span>
+                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            </div>
+        </a>
+    </div>
+
+    <!-- Recent Pengaduan -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-slate-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center">
+                        <i class="fas fa-history text-blue-600 mr-2"></i>
+                        Pengaduan Terbaru
+                    </h2>
+                    <p class="text-sm text-slate-600 mt-1">Daftar pengaduan yang baru saja Anda ajukan</p>
+                </div>
+                <a href="{{ route('pengaduan.index') }}" 
+                   class="hidden sm:flex items-center px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors font-semibold text-sm">
+                    <span>Lihat Semua</span>
+                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </a>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Pengaduan</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ $totalPengaduan ?? 0 }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-5 py-3">
-                        <div class="text-sm">
-                            <a href="{{ route('pengaduan.index') }}" class="font-medium text-blue-600 hover:text-blue-900">Lihat Semua Pengaduan</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Pengaduan Selesai</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ $selesaiCount ?? 0 }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-5 py-3">
-                        <div class="text-sm">
-                            <a href="{{ route('pengaduan.index') }}" class="font-medium text-green-600 hover:text-green-900">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Pengaduan Dalam Proses</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ $prosesCount ?? 0 }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-5 py-3">
-                        <div class="text-sm">
-                            <a href="{{ route('pengaduan.index') }}" class="font-medium text-yellow-600 hover:text-yellow-900">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-8">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Pengaduan Terbaru</h3>
-                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <ul role="list" class="divide-y divide-gray-200">
-                        @forelse($recentPengaduans ?? [] as $pengaduan)
-                            <li>
-                                <a href="{{ route('pengaduan.show', $pengaduan) }}" class="block hover:bg-gray-50">
-                                    <div class="px-4 py-4 sm:px-6">
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-sm font-medium text-indigo-600 truncate">
-                                                {{ $pengaduan->nama_pengaduan }}
-                                            </div>
-                                            <div class="ml-2 flex-shrink-0 flex">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    @if($pengaduan->status === 'Diajukan') bg-yellow-100 text-yellow-800
-                                                    @elseif($pengaduan->status === 'Disetujui') bg-green-100 text-green-800
-                                                    @elseif($pengaduan->status === 'Ditolak') bg-red-100 text-red-800
-                                                    @elseif($pengaduan->status === 'Diproses') bg-blue-100 text-blue-800
-                                                    @else bg-gray-100 text-gray-800
-                                                    @endif">
-                                                    {{ $pengaduan->status }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 sm:flex sm:justify-between">
-                                            <div class="sm:flex">
-                                                <p class="flex items-center text-sm text-gray-500">
-                                                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    </svg>
-                                                    {{ $pengaduan->lokasi }}
-                                                </p>
-                                            </div>
-                                            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                </svg>
-                                                <p>
-                                                    {{ \Carbon\Carbon::parse($pengaduan->tgl_pengajuan)->format('d M Y') }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        @empty
-                            <li class="px-4 py-4 sm:px-6">
-                                <p class="text-gray-500 text-center">Belum ada pengaduan yang diajukan.</p>
-                            </li>
-                        @endforelse
-                    </ul>
-                </div>
-            </div>
         </div>
-    </main>
-</body>
-</html>
+
+        @forelse($recentPengaduans ?? [] as $pengaduan)
+            <a href="{{ route('pengaduan.show', $pengaduan) }}" 
+               class="block p-6 border-b border-slate-100 hover:bg-slate-50 transition-colors group">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                            <h3 class="text-base font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                {{ $pengaduan->nama_pengaduan }}
+                            </h3>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-600 mb-2">
+                            <span class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-slate-400 mr-1.5"></i>
+                                {{ $pengaduan->lokasi }}
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fas fa-calendar text-slate-400 mr-1.5"></i>
+                                {{ \Carbon\Carbon::parse($pengaduan->tgl_pengajuan)->format('d M Y') }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex flex-col items-end">
+                        <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full mb-2
+                            @if($pengaduan->status === 'Diajukan') bg-slate-100 text-slate-700
+                            @elseif($pengaduan->status === 'Disetujui') bg-green-100 text-green-700
+                            @elseif($pengaduan->status === 'Ditolak') bg-red-100 text-red-700
+                            @elseif($pengaduan->status === 'Diproses') bg-amber-100 text-amber-700
+                            @elseif($pengaduan->status === 'Selesai') bg-emerald-100 text-emerald-700
+                            @else bg-slate-100 text-slate-700
+                            @endif">
+                            {{ $pengaduan->status }}
+                        </span>
+                        <i class="fas fa-chevron-right text-slate-400 text-sm group-hover:text-blue-600 transition-colors"></i>
+                    </div>
+                </div>
+            </a>
+        @empty
+            <div class="p-12 text-center">
+                <div class="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-inbox text-slate-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-700 mb-2">Belum Ada Pengaduan</h3>
+                <p class="text-slate-600 mb-4">Anda belum mengajukan pengaduan apapun</p>
+                <a href="{{ route('pengaduan.create') }}" 
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-sky-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all">
+                    <i class="fas fa-plus-circle mr-2"></i>
+                    Buat Pengaduan
+                </a>
+            </div>
+        @endforelse
+
+        @if(count($recentPengaduans ?? []) > 0)
+        <div class="p-4 bg-slate-50 sm:hidden">
+            <a href="{{ route('pengaduan.index') }}" 
+               class="flex items-center justify-center px-4 py-3 text-blue-600 hover:bg-white rounded-xl transition-colors font-semibold text-sm">
+                <span>Lihat Semua Pengaduan</span>
+                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            </a>
+        </div>
+        @endif
+    </div>
+</div>
+@endsection

@@ -11,11 +11,17 @@ use Illuminate\Support\Facades\Storage;
 
 class PengaduanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pengaduans = Pengaduan::where('id_user', Auth::id())
-            ->orderBy('tgl_pengajuan', 'desc')
-            ->get();
+        $query = Pengaduan::where('id_user', Auth::id());
+        
+        // Filter by status if provided
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+        
+        $pengaduans = $query->orderBy('tgl_pengajuan', 'desc')->get();
+        
         return view('pengguna.pengaduan.index', compact('pengaduans'));
     }
 

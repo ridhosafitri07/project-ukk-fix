@@ -1,235 +1,320 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Pengaduan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold">SAPRAS</h1>
+@extends('layouts.pengguna')
+
+@section('title', 'Edit Pengaduan')
+@section('header', 'Edit Pengaduan')
+@section('subheader', 'Perbarui informasi pengaduan Anda')
+
+@section('content')
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    .input-group {
+        transition: all 0.3s ease;
+    }
+    
+    .input-group:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-100 animate-fade-in-up">
+        @if ($errors->any())
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-6 m-6 rounded-xl">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-white text-xl"></i>
                     </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="ml-3 relative">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-gray-700">{{ auth()->user()->nama_pengguna }}</span>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800">Logout</button>
-                            </form>
-                        </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-red-800 mb-2">Terdapat Kesalahan</h3>
+                        <ul class="space-y-1 text-sm text-red-700">
+                            @foreach ($errors->all() as $error)
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-circle text-xs mt-1"></i>
+                                    <span>{{ $error }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        @endif
 
-    <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-gray-900">Edit Pengaduan</h2>
-                <a href="{{ route('pengaduan.show', $pengaduan) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    Kembali
-                </a>
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
+            <h3 class="text-2xl font-bold text-white flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-pen-to-square"></i>
+                </div>
+                <span>Form Edit Pengaduan</span>
+            </h3>
+        </div>
+
+        <form action="{{ route('pengaduan.update', $pengaduan) }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+            @csrf
+            @method('PUT')
+
+            <!-- Judul Pengaduan -->
+            <div class="input-group">
+                <label for="nama_pengaduan" class="block text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-heading text-white text-sm"></i>
+                    </div>
+                    <span>Judul Pengaduan <span class="text-red-500">*</span></span>
+                </label>
+                <input type="text" name="nama_pengaduan" id="nama_pengaduan" required
+                    class="block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-4 text-base transition"
+                    value="{{ old('nama_pengaduan', $pengaduan->nama_pengaduan) }}"
+                    placeholder="Masukkan judul pengaduan">
+                @error('nama_pengaduan')
+                    <p class="mt-2 text-sm text-red-600 flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ $message }}</span>
+                    </p>
+                @enderror
             </div>
-        </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white shadow rounded-lg p-6">
-                @if ($errors->any())
-                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">Terdapat beberapa kesalahan:</h3>
-                                <ul class="mt-2 text-sm text-red-700">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+            <!-- Lokasi -->
+            <div class="input-group">
+                <label for="id_lokasi" class="block text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-white text-sm"></i>
+                    </div>
+                    <span>Lokasi / Ruangan <span class="text-red-500">*</span></span>
+                </label>
+                <div class="relative">
+                    <select name="id_lokasi" id="id_lokasi" required
+                        class="block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-4 text-base transition appearance-none">
+                        <option value="">🏢 Pilih Lokasi / Ruangan</option>
+                        @foreach($lokasis as $lokasi)
+                            <option value="{{ $lokasi->id_lokasi }}" 
+                                {{ (old('id_lokasi', $currentLokasi->id_lokasi ?? null) == $lokasi->id_lokasi) ? 'selected' : '' }}>
+                                {{ $lokasi->nama_lokasi }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                </div>
+                @error('id_lokasi')
+                    <p class="mt-2 text-sm text-red-600 flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ $message }}</span>
+                    </p>
+                @enderror
+            </div>
+
+            <!-- Item/Barang -->
+            <div class="input-group">
+                <label for="id_item" class="block text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-box text-white text-sm"></i>
+                    </div>
+                    <span>Item / Barang <span class="text-red-500">*</span></span>
+                </label>
+                <div class="relative">
+                    <select name="id_item" id="id_item" required
+                        class="block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-4 text-base transition appearance-none">
+                        <option value="">📦 Pilih lokasi terlebih dahulu</option>
+                        @if($pengaduan->id_item && $pengaduan->item)
+                            <option value="{{ $pengaduan->item->id_item }}" selected>{{ $pengaduan->item->nama_item }}</option>
+                        @endif
+                    </select>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                </div>
+                @error('id_item')
+                    <p class="mt-2 text-sm text-red-600 flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ $message }}</span>
+                    </p>
+                @enderror
+            </div>
+
+            <!-- Deskripsi -->
+            <div class="input-group">
+                <label for="deskripsi" class="block text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-align-left text-white text-sm"></i>
+                    </div>
+                    <span>Deskripsi Masalah <span class="text-red-500">*</span></span>
+                </label>
+                <textarea name="deskripsi" id="deskripsi" rows="5" required
+                    class="block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 px-4 py-4 text-base transition"
+                    placeholder="Jelaskan detail pengaduan Anda">{{ old('deskripsi', $pengaduan->deskripsi) }}</textarea>
+                @error('deskripsi')
+                    <p class="mt-2 text-sm text-red-600 flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ $message }}</span>
+                    </p>
+                @enderror
+            </div>
+
+            <!-- Foto -->
+            <div class="input-group">
+                <label for="foto" class="block text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-camera text-white text-sm"></i>
+                    </div>
+                    <span>Foto Bukti</span>
+                </label>
+                
+                @if($pengaduan->foto)
+                    <div class="mb-4 bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl border-2 border-gray-200">
+                        <p class="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                            <i class="fas fa-image text-blue-600"></i>
+                            <span>Foto saat ini:</span>
+                        </p>
+                        <div class="relative inline-block">
+                            <img src="{{ asset('storage/' . $pengaduan->foto) }}" 
+                                 alt="Foto Pengaduan" 
+                                 class="max-w-lg w-full rounded-2xl shadow-xl border-4 border-white">
                         </div>
                     </div>
                 @endif
-
-                <form action="{{ route('pengaduan.update', $pengaduan) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    @csrf
-                    @method('PUT')
-
-                    <div>
-                        <label for="nama_pengaduan" class="block text-sm font-medium text-gray-700">Judul Pengaduan</label>
-                        <input type="text" name="nama_pengaduan" id="nama_pengaduan" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            value="{{ old('nama_pengaduan', $pengaduan->nama_pengaduan) }}"
-                            placeholder="Masukkan judul pengaduan">
-                        @error('nama_pengaduan')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                
+                <div class="mt-2 flex justify-center px-6 pt-8 pb-8 border-3 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:border-blue-400 transition">
+                    <div class="space-y-3 text-center">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-cloud-upload-alt text-blue-600 text-3xl"></i>
+                        </div>
+                        <div class="flex text-sm text-gray-600 justify-center">
+                            <label for="foto" class="relative cursor-pointer bg-white rounded-xl font-semibold text-blue-600 hover:text-blue-500 px-4 py-2 shadow-md hover:shadow-lg transition">
+                                <span><i class="fas fa-file-upload mr-2"></i>Pilih File Baru</span>
+                                <input type="file" name="foto" id="foto" class="sr-only" accept="image/*">
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-500">PNG, JPG, JPEG (Max. 2MB)</p>
+                        <p class="text-xs text-blue-600 font-medium">Biarkan kosong jika tidak ingin mengubah foto</p>
                     </div>
-
-                    <div>
-                        <label for="id_lokasi" class="block text-sm font-medium text-gray-700">Lokasi</label>
-                        <select name="id_lokasi" id="id_lokasi" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">-- Pilih Lokasi --</option>
-                            @foreach($lokasis as $lokasi)
-                                <option value="{{ $lokasi->id_lokasi }}" 
-                                    {{ (old('id_lokasi', $currentLokasi->id_lokasi ?? null) == $lokasi->id_lokasi) ? 'selected' : '' }}>
-                                    {{ $lokasi->nama_lokasi }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_lokasi')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="id_item" class="block text-sm font-medium text-gray-700">Item/Barang</label>
-                        <select name="id_item" id="id_item" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">-- Pilih lokasi terlebih dahulu --</option>
-                            @if($pengaduan->id_item && $pengaduan->item)
-                                <option value="{{ $pengaduan->item->id_item }}" selected>{{ $pengaduan->item->nama_item }}</option>
-                            @endif
-                        </select>
-                        @error('id_item')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                        <textarea name="deskripsi" id="deskripsi" rows="4" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            placeholder="Jelaskan detail pengaduan Anda">{{ old('deskripsi', $pengaduan->deskripsi) }}</textarea>
-                        @error('deskripsi')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="foto" class="block text-sm font-medium text-gray-700">Foto</label>
-                        @if($pengaduan->foto)
-                            <div class="mt-2 mb-4">
-                                <p class="text-sm text-gray-500 mb-2">Foto saat ini:</p>
-                                <img src="{{ asset('storage/' . $pengaduan->foto) }}" alt="Foto Pengaduan" class="max-w-lg rounded-lg shadow-md">
-                            </div>
-                        @endif
-                        <input type="file" name="foto" id="foto"
-                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                            accept="image/*">
-                        <p class="mt-1 text-sm text-gray-500">Format: JPG, JPEG, PNG (Max. 2MB). Biarkan kosong jika tidak ingin mengubah foto.</p>
-                        @error('foto')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex justify-between">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                            Simpan Perubahan
-                        </button>
-
-                        <form action="{{ route('pengaduan.destroy', $pengaduan) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                    onclick="return confirm('Apakah Anda yakin ingin menghapus pengaduan ini?')">
-                                Hapus Pengaduan
-                            </button>
-                        </form>
-                    </div>
-                </form>
+                </div>
+                @error('foto')
+                    <p class="mt-2 text-sm text-red-600 flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ $message }}</span>
+                    </p>
+                @enderror
             </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex flex-col sm:flex-row justify-between items-center pt-6 border-t-2 border-gray-200 space-y-4 sm:space-y-0">
+                <a href="{{ route('pengaduan.show', $pengaduan) }}" 
+                   class="text-gray-600 hover:text-gray-800 font-semibold flex items-center space-x-2 px-6 py-3 rounded-xl hover:bg-gray-100 transition">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Batal</span>
+                </a>
+                
+                <button type="submit" 
+                        class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl transform hover:scale-105 transition duration-300 flex items-center space-x-3">
+                    <i class="fas fa-save"></i>
+                    <span>Simpan Perubahan</span>
+                </button>
+            </div>
+
+            <!-- Delete Button -->
+            <div class="pt-6 border-t-2 border-red-200">
+                <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-xl border-2 border-red-200">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <h4 class="text-lg font-bold text-red-800 mb-2 flex items-center space-x-2">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Zona Bahaya</span>
+                            </h4>
+                            <p class="text-sm text-red-700">Menghapus pengaduan ini akan menghapus semua data terkait secara permanen.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Delete Form (Outside main form) -->
+        <div class="px-8 pb-8">
+            <form action="{{ route('pengaduan.destroy', $pengaduan) }}" method="POST" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-2xl shadow-xl transition flex items-center justify-center space-x-3"
+                        onclick="return confirm('⚠️ PERINGATAN!\n\nApakah Anda yakin ingin menghapus pengaduan ini?\nTindakan ini tidak dapat dibatalkan!')">
+                    <i class="fas fa-trash"></i>
+                    <span>Hapus Pengaduan Ini</span>
+                </button>
+            </form>
         </div>
-    </main>
+    </div>
+</div>
+@endsection
 
-    <script>
-        // Handle lokasi change untuk load items
-        document.getElementById('id_lokasi').addEventListener('change', function() {
-            const lokasiId = this.value;
-            const itemSelect = document.getElementById('id_item');
-            
-            // Reset dan disable item select
-            itemSelect.innerHTML = '<option value="">⏳ Memuat data...</option>';
-            itemSelect.disabled = true;
-            
-            if (!lokasiId) {
-                itemSelect.innerHTML = '<option value="">-- Pilih lokasi terlebih dahulu --</option>';
-                return;
-            }
-            
-            // URL yang benar sesuai dengan route
-            const url = `{{ route('api.lokasi.items', ['id_lokasi' => ':id']) }}`.replace(':id', lokasiId);
-            
-            console.log('🔍 Fetching URL:', url);
-            console.log('📍 Lokasi ID:', lokasiId);
-            
-            // Fetch items berdasarkan lokasi
-            fetch(url)
-                .then(response => {
-                    console.log('📡 Response status:', response.status);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('✅ Data received:', data);
-                    
-                    if (data.success && data.items && data.items.length > 0) {
-                        itemSelect.innerHTML = '<option value="">-- Pilih Item/Barang --</option>';
-                        data.items.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.id_item;
-                            option.textContent = `📦 ${item.nama_item}`;
-                            // Restore selection if editing
-                            @if($pengaduan->id_item)
-                            if (item.id_item == {{ $pengaduan->id_item }}) {
-                                option.selected = true;
-                            }
-                            @endif
-                            itemSelect.appendChild(option);
-                        });
-                        itemSelect.disabled = false;
-                        itemSelect.classList.remove('border-red-300', 'border-orange-300');
-                        itemSelect.classList.add('border-green-300');
-                        console.log('✅ Items loaded:', data.items.length);
-                    } else {
-                        itemSelect.innerHTML = '<option value="">ℹ️ Tidak ada item di lokasi ini</option>';
-                        itemSelect.disabled = true;
-                        itemSelect.classList.add('border-orange-300');
-                        console.log('ℹ️ No items found');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error details:', error);
-                    itemSelect.innerHTML = '<option value="">⚠️ Gagal memuat data - Silakan coba lagi</option>';
+@push('scripts')
+<script>
+    document.getElementById('id_lokasi').addEventListener('change', function() {
+        const lokasiId = this.value;
+        const itemSelect = document.getElementById('id_item');
+        
+        itemSelect.innerHTML = '<option value="">⏳ Memuat data...</option>';
+        itemSelect.disabled = true;
+        
+        if (!lokasiId) {
+            itemSelect.innerHTML = '<option value="">📦 Pilih lokasi terlebih dahulu</option>';
+            return;
+        }
+        
+        const url = `{{ route('api.lokasi.items', ['id_lokasi' => ':id']) }}`.replace(':id', lokasiId);
+        
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.items && data.items.length > 0) {
+                    itemSelect.innerHTML = '<option value="">✅ Pilih Item/Barang</option>';
+                    data.items.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id_item;
+                        option.textContent = `📦 ${item.nama_item}`;
+                        @if($pengaduan->id_item)
+                        if (item.id_item == {{ $pengaduan->id_item }}) {
+                            option.selected = true;
+                        }
+                        @endif
+                        itemSelect.appendChild(option);
+                    });
+                    itemSelect.disabled = false;
+                    itemSelect.classList.remove('border-red-300', 'border-orange-300');
+                    itemSelect.classList.add('border-green-300');
+                } else {
+                    itemSelect.innerHTML = '<option value="">ℹ️ Tidak ada item di lokasi ini</option>';
                     itemSelect.disabled = true;
-                    itemSelect.classList.add('border-red-300');
-                });
-        });
+                    itemSelect.classList.add('border-orange-300');
+                }
+            })
+            .catch(error => {
+                itemSelect.innerHTML = '<option value="">⚠️ Gagal memuat data</option>';
+                itemSelect.disabled = true;
+                itemSelect.classList.add('border-red-300');
+            });
+    });
 
-        // Trigger change event on page load if lokasi is already selected
-        window.addEventListener('DOMContentLoaded', function() {
-            const lokasiSelect = document.getElementById('id_lokasi');
-            if (lokasiSelect.value) {
-                lokasiSelect.dispatchEvent(new Event('change'));
-            }
-        });
-    </script>
-</body>
-</html>
+    window.addEventListener('DOMContentLoaded', function() {
+        const lokasiSelect = document.getElementById('id_lokasi');
+        if (lokasiSelect.value) {
+            lokasiSelect.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+@endpush
+@endsection

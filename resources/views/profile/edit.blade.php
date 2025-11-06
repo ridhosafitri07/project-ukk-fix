@@ -9,69 +9,73 @@
     <!-- Back Button -->
     <div class="mb-6">
         <a href="{{ route('profile.index') }}" 
-           class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 transition-all">
+           class="inline-flex items-center px-4 py-2 bg-white rounded-xl text-slate-700 hover:bg-slate-50 transition-all shadow-sm border border-slate-200">
             <i class="fas fa-arrow-left mr-2"></i>
-            Kembali ke Profil
+            Kembali
         </a>
     </div>
 
     @if(session('success'))
-    <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-center">
-        <i class="fas fa-check-circle mr-2"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center">
-        <i class="fas fa-exclamation-circle mr-2"></i>
-        <span>{{ session('error') }}</span>
+    <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl shadow-sm animate-slide-in">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-emerald-500 mr-3"></i>
+            <span class="text-emerald-800 font-medium">{{ session('success') }}</span>
+        </div>
     </div>
     @endif
 
     <!-- Edit Profile Form -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-        <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+        <div class="p-6 bg-gradient-to-r 
+            {{ auth()->user()->role === 'admin' ? 'from-indigo-500 to-purple-600' : 
+               (auth()->user()->role === 'petugas' ? 'from-emerald-500 to-green-600' : 
+               'from-blue-500 to-sky-600') }}">
             <h3 class="text-lg font-bold text-white flex items-center">
                 <i class="fas fa-user-edit mr-2"></i>
                 Informasi Profil
             </h3>
         </div>
-        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="p-6">
+        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="p-8">
             @csrf
             @method('PUT')
 
             <div class="space-y-6">
                 <!-- Profile Photo -->
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-3">Foto Profil</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-3">Foto Profil</label>
                     <div class="flex items-center space-x-6">
-                        <div class="flex-shrink-0">
+                        <div class="relative group">
                             @if($user->foto_profil)
                                 <img src="{{ asset('storage/' . $user->foto_profil) }}" 
                                      alt="Profile Photo" 
                                      id="preview-image"
-                                     class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-md">
+                                     class="w-24 h-24 rounded-2xl object-cover ring-4 ring-slate-100 shadow-lg">
                             @else
-                                <div id="preview-initials" class="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-gray-200 shadow-md
+                                <div id="preview-initials" class="w-24 h-24 rounded-2xl flex items-center justify-center text-white font-bold text-3xl ring-4 ring-slate-100 shadow-lg
                                     {{ $user->role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-purple-700' : 
-                                       ($user->role === 'petugas' ? 'bg-gradient-to-br from-green-500 to-green-700' : 
-                                       'bg-gradient-to-br from-blue-500 to-blue-700') }}">
+                                       ($user->role === 'petugas' ? 'bg-gradient-to-br from-emerald-500 to-green-700' : 
+                                       'bg-gradient-to-br from-blue-500 to-sky-700') }}">
                                     {{ strtoupper(substr($user->nama_pengguna, 0, 2)) }}
                                 </div>
-                                <img src="" alt="Preview" id="preview-image" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 shadow-md hidden">
+                                <img src="" alt="Preview" id="preview-image" class="w-24 h-24 rounded-2xl object-cover ring-4 ring-slate-100 shadow-lg hidden">
                             @endif
+                            <div class="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i class="fas fa-camera text-white text-xl"></i>
+                            </div>
                         </div>
                         <div class="flex-1">
                             <input type="file" name="foto_profil" id="foto_profil" accept="image/*" 
-                                   class="block w-full text-sm text-gray-500
-                                   file:mr-4 file:py-2 file:px-4
-                                   file:rounded-lg file:border-0
+                                   class="block w-full text-sm text-slate-500
+                                   file:mr-4 file:py-2.5 file:px-4
+                                   file:rounded-xl file:border-0
                                    file:text-sm file:font-semibold
-                                   file:bg-blue-50 file:text-blue-700
-                                   hover:file:bg-blue-100
+                                   file:bg-gradient-to-r 
+                                   {{ auth()->user()->role === 'admin' ? 'file:from-indigo-50 file:to-purple-50 file:text-indigo-700' : 
+                                      (auth()->user()->role === 'petugas' ? 'file:from-emerald-50 file:to-green-50 file:text-emerald-700' : 
+                                      'file:from-blue-50 file:to-sky-50 file:text-blue-700') }}
+                                   hover:file:brightness-95
                                    cursor-pointer">
-                            <p class="mt-2 text-xs text-gray-500">
+                            <p class="mt-2 text-xs text-slate-500">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 JPG, PNG, atau GIF. Maksimal 2MB.
                             </p>
@@ -97,12 +101,12 @@
 
                 <!-- Nama Lengkap -->
                 <div>
-                    <label for="nama_pengguna" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="nama_pengguna" class="block text-sm font-bold text-slate-700 mb-2">
                         Nama Lengkap <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="nama_pengguna" id="nama_pengguna" required
                            value="{{ old('nama_pengguna', $user->nama_pengguna) }}"
-                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">
                     @error('nama_pengguna')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -110,12 +114,12 @@
 
                 <!-- Username -->
                 <div>
-                    <label for="username" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="username" class="block text-sm font-bold text-slate-700 mb-2">
                         Username <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="username" id="username" required
                            value="{{ old('username', $user->username) }}"
-                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">
                     @error('username')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -123,13 +127,13 @@
 
                 <!-- Nomor Telepon -->
                 <div>
-                    <label for="telp_user" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="telp_user" class="block text-sm font-bold text-slate-700 mb-2">
                         Nomor Telepon
                     </label>
                     <input type="text" name="telp_user" id="telp_user"
                            value="{{ old('telp_user', $user->telp_user) }}"
                            placeholder="Contoh: 081234567890"
-                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">
                     @error('telp_user')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -137,26 +141,30 @@
 
                 <!-- Bio -->
                 <div>
-                    <label for="bio" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="bio" class="block text-sm font-bold text-slate-700 mb-2">
                         Bio / Tentang Saya
                     </label>
                     <textarea name="bio" id="bio" rows="4"
                               placeholder="Ceritakan sedikit tentang diri Anda..."
-                              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('bio', $user->bio) }}</textarea>
-                    <p class="mt-1 text-xs text-gray-500">Maksimal 500 karakter</p>
+                              class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">{{ old('bio', $user->bio) }}</textarea>
+                    <p class="mt-1 text-xs text-slate-500">Maksimal 500 karakter</p>
                     @error('bio')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end space-x-3 pt-4 border-t">
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
                     <a href="{{ route('profile.index') }}" 
-                       class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                       class="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors">
                         Batal
                     </a>
                     <button type="submit" 
-                            class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center">
+                            class="px-6 py-3 bg-gradient-to-r 
+                            {{ auth()->user()->role === 'admin' ? 'from-indigo-500 to-purple-600' : 
+                               (auth()->user()->role === 'petugas' ? 'from-emerald-500 to-green-600' : 
+                               'from-blue-500 to-sky-600') }}
+                            text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center">
                         <i class="fas fa-save mr-2"></i>
                         Simpan Perubahan
                     </button>
@@ -166,41 +174,37 @@
     </div>
 
     <!-- Change Password Form -->
-    <div id="change-password" class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="p-6 bg-gradient-to-r from-green-500 to-emerald-600">
+    <div id="change-password" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6 bg-gradient-to-r from-rose-500 to-red-600">
             <h3 class="text-lg font-bold text-white flex items-center">
                 <i class="fas fa-key mr-2"></i>
                 Ganti Password
             </h3>
         </div>
-        <form action="{{ route('profile.change-password') }}" method="POST" class="p-6">
+        <form action="{{ route('profile.change-password') }}" method="POST" class="p-8">
             @csrf
             @method('PUT')
 
             <div class="space-y-6">
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl">
                     <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
-                                Pastikan password baru Anda kuat dan mudah diingat. Jangan bagikan password kepada siapapun.
-                            </p>
-                        </div>
+                        <i class="fas fa-exclamation-triangle text-amber-400 mr-3 mt-0.5"></i>
+                        <p class="text-sm text-amber-800">
+                            Pastikan password baru Anda kuat dan mudah diingat. Jangan bagikan password kepada siapapun.
+                        </p>
                     </div>
                 </div>
 
                 <!-- Password Lama -->
                 <div>
-                    <label for="current_password" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="current_password" class="block text-sm font-bold text-slate-700 mb-2">
                         Password Lama <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
                         <input type="password" name="current_password" id="current_password" required
-                               class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                               class="w-full px-4 py-3 pr-12 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all">
                         <button type="button" onclick="togglePassword('current_password')" 
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="fas fa-eye" id="current_password-icon"></i>
                         </button>
                     </div>
@@ -211,18 +215,18 @@
 
                 <!-- Password Baru -->
                 <div>
-                    <label for="password" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="password" class="block text-sm font-bold text-slate-700 mb-2">
                         Password Baru <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
                         <input type="password" name="password" id="password" required
-                               class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                               class="w-full px-4 py-3 pr-12 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all">
                         <button type="button" onclick="togglePassword('password')" 
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="fas fa-eye" id="password-icon"></i>
                         </button>
                     </div>
-                    <p class="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
+                    <p class="mt-1 text-xs text-slate-500">Minimal 6 karakter</p>
                     @error('password')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -230,14 +234,14 @@
 
                 <!-- Konfirmasi Password -->
                 <div>
-                    <label for="password_confirmation" class="block text-sm font-bold text-gray-700 mb-2">
+                    <label for="password_confirmation" class="block text-sm font-bold text-slate-700 mb-2">
                         Konfirmasi Password Baru <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
                         <input type="password" name="password_confirmation" id="password_confirmation" required
-                               class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                               class="w-full px-4 py-3 pr-12 border-2 border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all">
                         <button type="button" onclick="togglePassword('password_confirmation')" 
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="fas fa-eye" id="password_confirmation-icon"></i>
                         </button>
                     </div>
@@ -247,13 +251,13 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end space-x-3 pt-4 border-t">
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
                     <button type="button" onclick="document.getElementById('password').value=''; document.getElementById('current_password').value=''; document.getElementById('password_confirmation').value='';"
-                            class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                            class="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors">
                         Reset Form
                     </button>
                     <button type="submit" 
-                            class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center">
+                            class="px-6 py-3 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center">
                         <i class="fas fa-key mr-2"></i>
                         Ganti Password
                     </button>
@@ -300,4 +304,12 @@ function togglePassword(fieldId) {
     }
 }
 </script>
+
+<style>
+@keyframes slideIn { 
+    from { opacity: 0; transform: translateY(-10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+.animate-slide-in { animation: slideIn 0.3s ease-out; }
+</style>
 @endsection

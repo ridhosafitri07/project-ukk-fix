@@ -121,10 +121,6 @@
                                 <i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}
                             </p>
                         @enderror
-                        <p class="mt-2 text-xs text-indigo-600 flex items-center">
-                            <i class="fas fa-info-circle mr-1"></i>
-                            Pilih lokasi terlebih dahulu untuk melihat daftar barang yang tersedia
-                        </p>
                     </div>
 
                     <!-- Item/Barang -->
@@ -137,10 +133,10 @@
                             <select name="id_item" id="id_item" required
                                 class="block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 px-4 py-3 text-base transition disabled:bg-gray-100 disabled:cursor-not-allowed"
                                 disabled>
-                                <option value="">📦 -- Pilih lokasi terlebih dahulu --</option>
+                                <option value="">� -- Pilih lokasi terlebih dahulu --</option>
                             </select>
                             <div id="loading-spinner" class="hidden absolute right-3 top-3">
-                                <i class="fas fa-spinner fa-spin text-indigo-600 text-xl"></i>
+                                <i class="fas fa-spinner fa-spin text-indigo-600"></i>
                             </div>
                         </div>
                         @error('id_item')
@@ -148,11 +144,13 @@
                                 <i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}
                             </p>
                         @enderror
-                        <p id="item-help-text" class="mt-2 text-xs text-gray-500 flex items-center">
-                            <i class="fas fa-lightbulb mr-1"></i>
-                            Daftar barang akan muncul setelah memilih lokasi
+                        <p id="item-info" class="mt-2 text-xs text-gray-500 flex items-center">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Pilih lokasi terlebih dahulu untuk melihat barang yang tersedia
                         </p>
-                    </div>                    <!-- Deskripsi -->
+                    </div>
+
+                    <!-- Deskripsi -->
                     <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-indigo-300 transition">
                         <label for="deskripsi" class="block text-sm font-bold text-gray-700 mb-2 flex items-center">
                             <i class="fas fa-align-left text-indigo-600 mr-2"></i>
@@ -219,6 +217,11 @@
     </main>
 
     <script>
+        // Data items per lokasi dari server
+        const itemsByLokasi = @json($itemsByLokasi);
+        
+        console.log('📦 Items by Lokasi:', itemsByLokasi);
+
         // Image preview function
         function previewImage(event) {
             const file = event.target.files[0];
@@ -232,108 +235,94 @@
             }
         }
 
-        // Handle lokasi change untuk load items
+        // Filter items berdasarkan lokasi yang dipilih
         document.getElementById('id_lokasi').addEventListener('change', function() {
             const lokasiId = this.value;
             const itemSelect = document.getElementById('id_item');
+            const itemInfo = document.getElementById('item-info');
             const spinner = document.getElementById('loading-spinner');
             
-            // Show loading spinner
-            spinner.classList.remove('hidden');
+            console.log('📍 Lokasi dipilih:', lokasiId);
             
-            // Reset dan disable item select
-            itemSelect.innerHTML = '<option value="">⏳ Memuat data...</option>';
-            itemSelect.disabled = true;
+            // Reset item select
+            itemSelect.innerHTML = '';
             
             if (!lokasiId) {
-                itemSelect.innerHTML = '<option value="">📦 -- Pilih lokasi terlebih dahulu --</option>';
-                spinner.classList.add('hidden');
+                // Tidak ada lokasi dipilih
+                itemSelect.disabled = true;
+                itemSelect.innerHTML = '<option value="">📍 -- Pilih lokasi terlebih dahulu --</option>';
+                itemSelect.classList.remove('border-green-300', 'border-orange-300');
+                itemSelect.classList.add('border-gray-300');
+                itemInfo.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Pilih lokasi terlebih dahulu untuk melihat barang yang tersedia';
+                itemInfo.className = 'mt-2 text-xs text-gray-500 flex items-center';
                 return;
             }
             
-            // URL yang benar sesuai dengan route
-            const url = `{{ route('api.lokasi.items', ['id_lokasi' => ':id']) }}`.replace(':id', lokasiId);
+            // Show spinner
+            spinner.classList.remove('hidden');
             
-            console.log('🔍 Fetching URL:', url);
-            console.log('📍 Lokasi ID:', lokasiId);
-            
-            // Fetch items berdasarkan lokasi
-            fetch(url)
-                .then(response => {
-                    console.log('📡 Response status:', response.status);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('✅ Data received:', data);
-                    spinner.classList.add('hidden');
+            // Simulasi loading (untuk UX yang lebih baik)
+            setTimeout(() => {
+                const items = itemsByLokasi[lokasiId] || [];
+                
+                console.log('📦 Items di lokasi ini:', items);
+                
+                if (items.length > 0) {
+                    // Ada items di lokasi ini
+                    itemSelect.innerHTML = '<option value="">✅ -- Pilih Item/Barang --</option>';
+                    items.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id_item;
+                        option.textContent = '📦 ' + item.nama_item;
+                        if (item.deskripsi) {
+                            option.title = item.deskripsi;
+                        }
+                        itemSelect.appendChild(option);
+                    });
+                    itemSelect.disabled = false;
+                    itemSelect.classList.remove('border-gray-300', 'border-orange-300');
+                    itemSelect.classList.add('border-green-300');
                     
-                    const helpText = document.getElementById('item-help-text');
+                    // Success message
+                    itemInfo.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Ditemukan ' + items.length + ' barang di lokasi ini';
+                    itemInfo.className = 'mt-2 text-xs text-green-600 font-medium flex items-center';
                     
-                    if (data.success && data.items && data.items.length > 0) {
-                        // Ada items di lokasi ini
-                        itemSelect.innerHTML = '<option value="">✅ -- Pilih Item/Barang --</option>';
-                        data.items.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.id_item;
-                            option.textContent = `📦 ${item.nama_item}`;
-                            if (item.deskripsi) {
-                                option.title = item.deskripsi;
-                            }
-                            itemSelect.appendChild(option);
-                        });
-                        itemSelect.disabled = false;
-                        itemSelect.classList.remove('border-red-300');
-                        itemSelect.classList.add('border-green-300');
-                        
-                        // Success message
-                        helpText.innerHTML = `<i class="fas fa-check-circle mr-1 text-green-600"></i><span class="text-green-600 font-medium">Ditemukan ${data.items.length} barang di lokasi ini</span>`;
-                        console.log('✅ Items loaded successfully');
-                        
-                    } else {
-                        // Tidak ada items di lokasi ini
-                        itemSelect.innerHTML = '<option value="">-- Tidak ada item di lokasi ini --</option>';
-                        itemSelect.disabled = true;
-                        itemSelect.classList.remove('border-green-300');
-                        itemSelect.classList.add('border-orange-300');
-                        
-                        // Info message - bukan error
-                        helpText.innerHTML = `
-                            <div class="flex items-start space-x-2 bg-orange-50 p-3 rounded-lg border border-orange-200">
-                                <i class="fas fa-info-circle text-orange-600 mt-0.5"></i>
-                                <div class="flex-1">
-                                    <p class="text-orange-700 font-medium text-sm">Belum ada barang yang terdaftar di lokasi ini</p>
-                                    <p class="text-orange-600 text-xs mt-1">Silakan pilih lokasi lain atau hubungi admin untuk menambahkan barang</p>
-                                </div>
-                            </div>
-                        `;
-                        console.log('ℹ️ No items found for this location');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error details:', error);
-                    spinner.classList.add('hidden');
-                    itemSelect.innerHTML = '<option value="">⚠️ -- Gagal memuat data --</option>';
+                    console.log('✅ Berhasil load ' + items.length + ' items');
+                } else {
+                    // Tidak ada items di lokasi ini
+                    itemSelect.innerHTML = '<option value="">❌ -- Tidak ada barang di lokasi ini --</option>';
                     itemSelect.disabled = true;
-                    itemSelect.classList.add('border-red-300');
+                    itemSelect.classList.remove('border-gray-300', 'border-green-300');
+                    itemSelect.classList.add('border-orange-300');
                     
-                    const helpText = document.getElementById('item-help-text');
+                    // Warning message
+                    itemInfo.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Belum ada barang yang terdaftar di lokasi ini. Pilih lokasi lain atau hubungi admin.';
+                    itemInfo.className = 'mt-2 text-xs text-orange-600 font-medium flex items-center';
                     
-                    // Error message - masalah koneksi/server
-                    helpText.innerHTML = `
-                        <div class="flex items-start space-x-2 bg-red-50 p-3 rounded-lg border border-red-200">
-                            <i class="fas fa-exclamation-triangle text-red-600 mt-0.5"></i>
-                            <div class="flex-1">
-                                <p class="text-red-700 font-medium text-sm">Gagal memuat data barang</p>
-                                <p class="text-red-600 text-xs mt-1">Terjadi kesalahan koneksi. Silakan refresh halaman atau coba lagi.</p>
-                                <p class="text-red-500 text-xs mt-1 font-mono">${error.message}</p>
-                            </div>
-                        </div>
-                    `;
-                });
+                    console.log('⚠️ Tidak ada items di lokasi ini');
+                }
+                
+                // Hide spinner
+                spinner.classList.add('hidden');
+            }, 300); // Delay 300ms untuk efek loading
         });
+
+        // Check if ada old value (dari validation error)
+        const oldLokasiId = '{{ old('id_lokasi') }}';
+        const oldItemId = '{{ old('id_item') }}';
+        
+        if (oldLokasiId) {
+            // Trigger change event untuk load items dari lokasi yang sebelumnya dipilih
+            document.getElementById('id_lokasi').value = oldLokasiId;
+            document.getElementById('id_lokasi').dispatchEvent(new Event('change'));
+            
+            // Set old item value setelah items loaded
+            setTimeout(() => {
+                if (oldItemId) {
+                    document.getElementById('id_item').value = oldItemId;
+                }
+            }, 500);
+        }
     </script>
 </body>
 </html>

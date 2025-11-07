@@ -251,6 +251,7 @@
             <!-- Content -->
             <main class="flex-1 overflow-y-auto">
                 <div class="p-6 lg:p-8">
+                    {{-- SUCCESS NOTIFICATION - ONLY ONE PLACE --}}
                     @if(session('success'))
                     <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl shadow-sm animate-slide-in">
                         <div class="flex items-center">
@@ -260,6 +261,7 @@
                     </div>
                     @endif
 
+                    {{-- ERROR NOTIFICATION --}}
                     @if(session('error'))
                     <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-sm animate-slide-in">
                         <div class="flex items-center">

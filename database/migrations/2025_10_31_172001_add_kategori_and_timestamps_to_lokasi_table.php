@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('lokasi', function (Blueprint $table) {
-            $table->enum('kategori', ['kelas', 'lab', 'kantor', 'umum', 'area_luar'])
-                  ->default('umum')
-                  ->after('nama_lokasi');
-            $table->timestamps();
+            //
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('lokasi', function (Blueprint $table) {
-            $table->dropColumn(['kategori', 'created_at', 'updated_at']);
+            //
         });
     }
 };

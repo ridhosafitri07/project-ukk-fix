@@ -8,30 +8,11 @@ class Lokasi extends Model
 {
     protected $table = 'lokasi';
     protected $primaryKey = 'id_lokasi';
-    public $timestamps = true;
+    public $timestamps = false;
     
     protected $fillable = [
-        'nama_lokasi',
-        'kategori'
+        'nama_lokasi'
     ];
-
-    protected $casts = [
-        'kategori' => 'string',
-    ];
-
-    // Accessor untuk badge warna kategori
-    public function getKategoriBadgeAttribute()
-    {
-        $badges = [
-            'kelas' => ['color' => 'blue', 'icon' => 'fa-chalkboard', 'label' => 'Kelas'],
-            'lab' => ['color' => 'purple', 'icon' => 'fa-flask', 'label' => 'Laboratorium'],
-            'kantor' => ['color' => 'green', 'icon' => 'fa-building', 'label' => 'Kantor'],
-            'umum' => ['color' => 'gray', 'icon' => 'fa-door-open', 'label' => 'Umum'],
-            'area_luar' => ['color' => 'yellow', 'icon' => 'fa-tree', 'label' => 'Area Luar'],
-        ];
-        
-        return $badges[$this->kategori] ?? $badges['umum'];
-    }
 
     public function listLokasi()
     {
@@ -41,11 +22,5 @@ class Lokasi extends Model
     public function items()
     {
         return $this->belongsToMany(Item::class, 'list_lokasi', 'id_lokasi', 'id_item');
-    }
-
-    // Accessor untuk jumlah barang
-    public function getJumlahBarangAttribute()
-    {
-        return $this->items()->count();
     }
 }

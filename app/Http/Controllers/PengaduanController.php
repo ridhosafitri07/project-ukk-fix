@@ -11,71 +11,38 @@ use Illuminate\Support\Facades\Storage;
 
 class PengaduanController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Pengaduan::where('id_user', Auth::id());
-        
-        // Filter by status if provided
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
-        }
-        
-        $pengaduans = $query->orderBy('tgl_pengajuan', 'desc')->get();
-        
+        $pengaduans = Pengaduan::where('id_user', Auth::id())
+            ->orderBy('tgl_pengajuan', 'desc')
+            ->get();
         return view('pengguna.pengaduan.index', compact('pengaduans'));
     }
 
     public function create()
     {
-        $lokasis = Lokasi::all();
-        return view('pengguna.pengaduan.create', compact('lokasis'));
-    }
-
-    public function getItemsByLokasi($id_lokasi)
-    {
-        try {
-            \Log::info("Fetching items for lokasi ID: {$id_lokasi}");
-            
-            $lokasi = Lokasi::with('items')->find($id_lokasi);
-            
-            if (!$lokasi) {
-                \Log::warning("Lokasi not found: {$id_lokasi}");
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Lokasi tidak ditemukan',
-                    'items' => []
-                ], 404);
-            }
-            
-            // Get items and fix encoding issues
-            $items = $lokasi->items->map(function($item) {
-                return [
+        // Ambil semua lokasi
+        $lokasis = Lokasi::orderBy('nama_lokasi', 'asc')->get();
+        
+        // Ambil semua item beserta relasi lokasi-nya
+        $items = Item::with('lokasis')->orderBy('nama_item', 'asc')->get();
+        
+        // Buat mapping item per lokasi untuk JavaScript
+        $itemsByLokasi = [];
+        foreach ($items as $item) {
+            foreach ($item->lokasis as $lokasi) {
+                if (!isset($itemsByLokasi[$lokasi->id_lokasi])) {
+                    $itemsByLokasi[$lokasi->id_lokasi] = [];
+                }
+                $itemsByLokasi[$lokasi->id_lokasi][] = [
                     'id_item' => $item->id_item,
-                    'nama_item' => mb_convert_encoding($item->nama_item ?? '', 'UTF-8', 'UTF-8'),
-                    'deskripsi' => mb_convert_encoding($item->deskripsi ?? '', 'UTF-8', 'UTF-8'),
-                    'lokasi' => mb_convert_encoding($item->lokasi ?? '', 'UTF-8', 'UTF-8'),
+                    'nama_item' => $item->nama_item,
+                    'deskripsi' => $item->deskripsi ?? ''
                 ];
-            });
-            
-            \Log::info("Found {$items->count()} items for lokasi {$id_lokasi}");
-            
-            return response()->json([
-                'success' => true,
-                'items' => $items,
-                'lokasi_nama' => mb_convert_encoding($lokasi->nama_lokasi ?? '', 'UTF-8', 'UTF-8')
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error("Error fetching items for lokasi {$id_lokasi}: " . $e->getMessage());
-            \Log::error($e->getTraceAsString());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat memuat data',
-                'items' => [],
-                'error_detail' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
+            }
         }
+        
+        return view('pengguna.pengaduan.create', compact('lokasis', 'items', 'itemsByLokasi'));
     }
 
     public function store(Request $request)
@@ -83,16 +50,12 @@ class PengaduanController extends Controller
         $validated = $request->validate([
             'nama_pengaduan' => 'required|string|max:200',
             'deskripsi' => 'required|string',
-            'id_lokasi' => 'required|exists:lokasi,id_lokasi',
-            'id_item' => 'required|exists:items,id_item',
+            'lokasi' => 'required|string|max:200',
             'foto' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ], [
             'nama_pengaduan.required' => 'Judul pengaduan wajib diisi',
             'deskripsi.required' => 'Deskripsi wajib diisi',
-            'id_lokasi.required' => 'Lokasi wajib dipilih',
-            'id_lokasi.exists' => 'Lokasi tidak valid',
-            'id_item.required' => 'Item/Barang wajib dipilih',
-            'id_item.exists' => 'Item/Barang tidak valid',
+            'lokasi.required' => 'Lokasi wajib diisi',
             'foto.required' => 'Foto wajib diunggah',
             'foto.image' => 'File harus berupa gambar',
             'foto.mimes' => 'Format foto harus JPG, JPEG, atau PNG',
@@ -110,14 +73,10 @@ class PengaduanController extends Controller
             $fotoPath = $file->storeAs('pengaduan', $fileName, 'public');
         }
 
-        // Get nama lokasi untuk field lokasi
-        $lokasi = Lokasi::find($validated['id_lokasi']);
-
         Pengaduan::create([
             'nama_pengaduan' => $validated['nama_pengaduan'],
             'deskripsi' => $validated['deskripsi'],
-            'lokasi' => $lokasi->nama_lokasi,
-            'id_item' => $validated['id_item'],
+            'lokasi' => $validated['lokasi'],
             'foto' => $fotoPath,
             'status' => 'Diajukan',
             'id_user' => Auth::id(),
@@ -147,12 +106,7 @@ class PengaduanController extends Controller
                 ->with('error', 'Pengaduan yang sudah diproses tidak dapat diubah.');
         }
 
-        $lokasis = Lokasi::all();
-        
-        // Get current lokasi id dari nama lokasi
-        $currentLokasi = Lokasi::where('nama_lokasi', $pengaduan->lokasi)->first();
-        
-        return view('pengguna.pengaduan.edit', compact('pengaduan', 'lokasis', 'currentLokasi'));
+        return view('pengguna.pengaduan.edit', compact('pengaduan'));
     }
 
     public function update(Request $request, Pengaduan $pengaduan)
@@ -169,29 +123,21 @@ class PengaduanController extends Controller
         $validated = $request->validate([
             'nama_pengaduan' => 'required|string|max:200',
             'deskripsi' => 'required|string',
-            'id_lokasi' => 'required|exists:lokasi,id_lokasi',
-            'id_item' => 'required|exists:items,id_item',
+            'lokasi' => 'required|string|max:200',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ], [
             'nama_pengaduan.required' => 'Judul pengaduan wajib diisi',
             'deskripsi.required' => 'Deskripsi wajib diisi',
-            'id_lokasi.required' => 'Lokasi wajib dipilih',
-            'id_lokasi.exists' => 'Lokasi tidak valid',
-            'id_item.required' => 'Item/Barang wajib dipilih',
-            'id_item.exists' => 'Item/Barang tidak valid',
+            'lokasi.required' => 'Lokasi wajib diisi',
             'foto.image' => 'File harus berupa gambar',
             'foto.mimes' => 'Format foto harus JPG, JPEG, atau PNG',
             'foto.max' => 'Ukuran foto maksimal 2MB'
         ]);
 
-        // Get nama lokasi untuk field lokasi
-        $lokasi = Lokasi::find($validated['id_lokasi']);
-        
         // Update basic fields
         $pengaduan->nama_pengaduan = $validated['nama_pengaduan'];
         $pengaduan->deskripsi = $validated['deskripsi'];
-        $pengaduan->lokasi = $lokasi->nama_lokasi;
-        $pengaduan->id_item = $validated['id_item'];
+        $pengaduan->lokasi = $validated['lokasi'];
 
         // Handle photo update
         if ($request->hasFile('foto')) {

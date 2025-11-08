@@ -217,15 +217,15 @@
                     <i class="fas fa-arrow-right text-blue-500 group-hover:translate-x-2 transition-transform"></i>
                 </a>
                 
-                <a href="{{ route('admin.sarpras.history') }}" 
+                <a href="{{ route('admin.laporan.index', ['type' => 'permintaan']) }}" 
                    class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg hover:shadow-md transition-all group">
                     <div class="flex items-center">
                         <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
-                            <i class="fas fa-history text-white"></i>
+                            <i class="fas fa-file-alt text-white"></i>
                         </div>
                         <div>
-                            <p class="font-semibold text-gray-800">Riwayat Permintaan</p>
-                            <p class="text-xs text-gray-600">History approval</p>
+                            <p class="font-semibold text-gray-800">Laporan Permintaan</p>
+                            <p class="text-xs text-gray-600">Lihat laporan lengkap</p>
                         </div>
                     </div>
                     <i class="fas fa-arrow-right text-green-500 group-hover:translate-x-2 transition-transform"></i>

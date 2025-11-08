@@ -44,31 +44,6 @@
                 </div>
             </div>
 
-            <!-- Pilih Lokasi -->
-            <div class="space-y-2">
-                <label for="id_lokasi" class="block text-sm font-bold text-gray-700">
-                    <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
-                    Pilih Lokasi/Ruangan <span class="text-red-500">*</span>
-                </label>
-                <select name="id_lokasi" 
-                        id="id_lokasi" 
-                        required
-                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition @error('id_lokasi') border-red-500 @enderror">
-                    <option value="">-- Pilih Lokasi --</option>
-                    @foreach($lokasis as $lokasi)
-                        <option value="{{ $lokasi->id_lokasi }}" {{ old('id_lokasi') == $lokasi->id_lokasi ? 'selected' : '' }}>
-                            {{ $lokasi->nama_lokasi }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('id_lokasi')
-                    <p class="mt-2 text-sm text-red-600 flex items-center">
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ $message }}
-                    </p>
-                @enderror
-            </div>
-
             <!-- Pilih Barang -->
             <div class="space-y-2">
                 <label for="id_item" class="block text-sm font-bold text-gray-700">
@@ -92,6 +67,48 @@
                         {{ $message }}
                     </p>
                 @enderror
+            </div>
+
+            <!-- Pilih Lokasi (Multiple) -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-gray-700">
+                    <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
+                    Pilih Lokasi/Ruangan <span class="text-red-500">*</span>
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Pilih satu atau lebih lokasi untuk barang ini
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 border-2 border-gray-300 rounded-lg bg-gray-50 max-h-80 overflow-y-auto">
+                    @foreach($lokasis as $lokasi)
+                        <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-purple-500 transition">
+                            <input type="checkbox" 
+                                   name="lokasi[]" 
+                                   id="lokasi_{{ $lokasi->id_lokasi }}" 
+                                   value="{{ $lokasi->id_lokasi }}"
+                                   {{ is_array(old('lokasi')) && in_array($lokasi->id_lokasi, old('lokasi')) ? 'checked' : '' }}
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="lokasi_{{ $lokasi->id_lokasi }}" class="ml-3 text-sm text-gray-700 cursor-pointer flex-1">
+                                <span class="font-medium">{{ $lokasi->nama_lokasi }}</span>
+                                @if($lokasi->kategori)
+                                    <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-{{ $lokasi->kategori_badge['color'] ?? 'gray' }}-100 text-{{ $lokasi->kategori_badge['color'] ?? 'gray' }}-700">
+                                        {{ $lokasi->kategori }}
+                                    </span>
+                                @endif
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
+                @error('lokasi')
+                    <p class="mt-2 text-sm text-red-600 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ $message }}
+                    </p>
+                @enderror
+                <p class="mt-2 text-xs text-gray-500 flex items-center">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Minimal pilih 1 lokasi
+                </p>
             </div>
 
             <!-- Preview Card -->

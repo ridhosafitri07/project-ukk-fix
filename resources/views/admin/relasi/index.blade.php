@@ -179,19 +179,19 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
-                                <a href="{{ route('admin.relasi.edit', $relasi->id_list) }}" 
+                                <a href="{{ route('admin.relasi.edit', $relasi->id_item) }}" 
                                    class="inline-flex items-center px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition shadow" 
-                                   title="Edit">
+                                   title="Edit Distribusi Barang">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button type="button" 
-                                        onclick="confirmDelete({{ $relasi->id_list }}, '{{ $relasi->lokasi->nama_lokasi ?? '-' }}', '{{ $relasi->item->nama_item ?? '-' }}')"
+                                        onclick="confirmDelete('{{ $relasi->id_item }}_{{ $relasi->id_lokasi }}', '{{ $relasi->lokasi->nama_lokasi ?? '-' }}', '{{ $relasi->item->nama_item ?? '-' }}')"
                                         class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition shadow" 
                                         title="Hapus">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                <form id="delete-form-{{ $relasi->id_list }}" 
-                                      action="{{ route('admin.relasi.destroy', $relasi->id_list) }}" 
+                                <form id="delete-form-{{ $relasi->id_item }}_{{ $relasi->id_lokasi }}" 
+                                      action="{{ route('admin.relasi.destroy', $relasi->id_item . '_' . $relasi->id_lokasi) }}" 
                                       method="POST" 
                                       class="hidden">
                                     @csrf

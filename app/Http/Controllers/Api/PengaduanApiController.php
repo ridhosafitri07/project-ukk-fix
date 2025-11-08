@@ -43,33 +43,43 @@ class PengaduanApiController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getByStatus(Request $request, $status)
-    {
-        $user = $request->user();
-        
-        $validStatus = ['pending', 'proses', 'selesai', 'ditolak'];
-        
-        if (!in_array($status, $validStatus)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Status tidak valid'
-            ], 400);
-        }
-
-        $pengaduans = Pengaduan::where('id_user', $user->id_user)
-            ->where('status', $status)
-            ->with(['item', 'petugas.user'])
-            ->orderBy('tgl_pengajuan', 'desc')
-            ->get()
-            ->map(function($pengaduan) {
-                return $this->formatPengaduan($pengaduan);
-            });
-
+{
+    $user = $request->user();
+    
+    // Mapping dari status API ke status database
+    $statusMapping = [
+        'pending' => 'Diajukan',
+        'proses' => 'Diproses', 
+        'selesai' => 'Disetujui',
+        'ditolak' => 'Ditolak'
+    ];
+    
+    // Jika status ada di mapping, gunakan mapped value
+    $dbStatus = $statusMapping[$status] ?? $status;
+    
+    $validStatus = ['Diajukan', 'Diproses', 'Disetujui', 'Ditolak'];
+    
+    if (!in_array($dbStatus, $validStatus)) {
         return response()->json([
-            'success' => true,
-            'data' => $pengaduans
-        ], 200);
+            'success' => false,
+            'message' => 'Status tidak valid'
+        ], 400);
     }
 
+    $pengaduans = Pengaduan::where('id_user', $user->id_user)
+        ->where('status', $dbStatus)
+        ->with(['item', 'petugas.user'])
+        ->orderBy('tgl_pengajuan', 'desc')
+        ->get()
+        ->map(function($pengaduan) {
+            return $this->formatPengaduan($pengaduan);
+        });
+
+    return response()->json([
+        'success' => true,
+        'data' => $pengaduans
+    ], 200);
+}
     /**
      * Show single pengaduan
      * 
@@ -146,7 +156,7 @@ class PengaduanApiController extends Controller
             'id_item' => $request->id_item,
             'foto' => $fotoPath,
             'id_user' => $user->id_user,
-            'status' => 'pending',
+            'status' => 'Diajukan',
             'tgl_pengajuan' => now(),
         ]);
 
@@ -182,7 +192,7 @@ class PengaduanApiController extends Controller
         }
 
         // Only allow update if status is pending
-        if ($pengaduan->status !== 'pending') {
+        if ($pengaduan->status !== 'Diajukan') {
             return response()->json([
                 'success' => false,
                 'message' => 'Pengaduan yang sudah diproses tidak dapat diubah'
@@ -270,7 +280,7 @@ class PengaduanApiController extends Controller
         }
 
         // Only allow delete if status is pending
-        if ($pengaduan->status !== 'pending') {
+        if ($pengaduan->status !== 'Diajukan') {
             return response()->json([
                 'success' => false,
                 'message' => 'Pengaduan yang sudah diproses tidak dapat dihapus'

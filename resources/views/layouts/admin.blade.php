@@ -62,6 +62,12 @@
                         <span x-show="sidebarOpen" class="font-medium">Pengaduan</span>
                     </a>
 
+                    <a href="{{ route('admin.laporan.index') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-700 {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
+                        <i class="fas fa-file-alt w-5 text-center"></i>
+                        <span x-show="sidebarOpen" class="font-medium">Laporan</span>
+                    </a>
+
                     <!-- Dropdown: Manajemen Sarpras -->
                     <div x-data="{ open: {{ request()->routeIs('admin.sarpras.*') || request()->routeIs('admin.master-*') ? 'true' : 'false' }} }">
                         <button @click="open = !open" 
@@ -79,25 +85,19 @@
                                 <i class="fas fa-clipboard-check w-4"></i>
                                 <span>Daftar Permintaan</span>
                             </a>
-                            
-                            <a href="{{ route('admin.sarpras.history') }}" 
-                               class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition {{ request()->routeIs('admin.sarpras.history') ? 'bg-slate-100 font-semibold' : '' }}">
-                                <i class="fas fa-history w-4"></i>
-                                <span>Riwayat</span>
-                            </a>
 
                             <div class="my-2 border-t border-slate-200"></div>
                             
                             <a href="{{ route('admin.master-lokasi.index') }}" 
                                class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition {{ request()->routeIs('admin.master-lokasi.*') ? 'bg-slate-100 font-semibold' : '' }}">
                                 <i class="fas fa-map-marker-alt w-4"></i>
-                                <span>Master Lokasi</span>
+                                <span>Lokasi</span>
                             </a>
                             
                             <a href="{{ route('admin.master-barang.index') }}" 
                                class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition {{ request()->routeIs('admin.master-barang.*') ? 'bg-slate-100 font-semibold' : '' }}">
                                 <i class="fas fa-box w-4"></i>
-                                <span>Master Barang</span>
+                                <span>Barang</span>
                             </a>
                             
                             <a href="{{ route('admin.relasi.index') }}" 

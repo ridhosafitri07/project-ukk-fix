@@ -54,18 +54,32 @@ Route::middleware('auth')->group(function () {
             Route::put('/{pengaduan}/status', [AdminPengaduanController::class, 'updateStatus'])->name('admin.pengaduan.update-status');
         });
 
+        // Laporan Routes
+        Route::prefix('laporan')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\LaporanController::class, 'index'])->name('admin.laporan.index');
+            Route::get('/export', [\App\Http\Controllers\Admin\LaporanController::class, 'export'])->name('admin.laporan.export');
+        });
+
         // Sarpras Management Routes
         Route::prefix('sarpras')->group(function () {
             Route::get('/', [SarprasController::class, 'index'])->name('admin.sarpras.index');
             Route::get('/permintaan', [SarprasController::class, 'permintaanList'])->name('admin.sarpras.permintaan-list');
             Route::get('/permintaan/{id}', [SarprasController::class, 'showPermintaan'])->name('admin.sarpras.show-permintaan');
             Route::put('/permintaan/{id}/status', [SarprasController::class, 'updateStatus'])->name('admin.sarpras.update-status');
-            Route::get('/history', [SarprasController::class, 'history'])->name('admin.sarpras.history');
-            Route::get('/history/export', [SarprasController::class, 'exportHistory'])->name('admin.sarpras.export-history');
         });
 
         // User Management Routes
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class, ['as' => 'admin']);
+        
+        // Master Lokasi Management Routes
+        Route::resource('master-lokasi', \App\Http\Controllers\Admin\MasterLokasiController::class, ['as' => 'admin']);
+        
+        // Master Barang Management Routes
+        Route::resource('master-barang', \App\Http\Controllers\Admin\MasterBarangController::class, ['as' => 'admin']);
+        
+        // Relasi Item-Lokasi Management Routes
+        Route::resource('relasi', \App\Http\Controllers\Admin\RelasiController::class, ['as' => 'admin'])
+            ->only(['index', 'create', 'store', 'destroy', 'edit', 'update']);
     });
 
     // ===== PETUGAS ROUTES =====

@@ -66,24 +66,4 @@ class SarprasController extends Controller
             ->route('admin.sarpras.show-permintaan', ['id' => $id])
             ->with('success', 'Status permintaan berhasil diperbarui');
     }
-
-    public function history()
-    {
-        $history = TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
-            ->whereIn('status_permintaan', ['Disetujui', 'Ditolak'])
-            ->orderBy('tanggal_persetujuan', 'desc')
-            ->paginate(10);
-
-        return view('admin.sarpras.history', compact('history'));
-    }
-
-    public function exportHistory()
-    {
-        $data = TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
-            ->whereIn('status_permintaan', ['Disetujui', 'Ditolak'])
-            ->orderBy('tanggal_persetujuan', 'desc')
-            ->get();
-
-        return back()->with('info', 'Fitur export akan segera tersedia');
-    }
 }

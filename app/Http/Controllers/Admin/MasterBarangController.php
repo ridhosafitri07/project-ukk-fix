@@ -64,14 +64,25 @@ class MasterBarangController extends Controller
         $validated = $request->validate([
             'nama_item' => 'required|string|max:200',
             'deskripsi' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ], [
             'nama_item.required' => 'Nama item harus diisi',
+            'foto.image' => 'File harus berupa gambar',
+            'foto.mimes' => 'Format foto harus JPEG, PNG, atau JPG',
+            'foto.max' => 'Ukuran foto maksimal 2MB',
         ]);
+
+        // Handle foto upload
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('items', 'public');
+        }
 
         // Create item
         Item::create([
             'nama_item' => $validated['nama_item'],
-            'deskripsi' => $validated['deskripsi']
+            'deskripsi' => $validated['deskripsi'],
+            'foto' => $fotoPath
         ]);
 
         return redirect()
@@ -104,14 +115,38 @@ class MasterBarangController extends Controller
         $validated = $request->validate([
             'nama_item' => 'required|string|max:200',
             'deskripsi' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ], [
             'nama_item.required' => 'Nama item harus diisi',
+            'foto.image' => 'File harus berupa gambar',
+            'foto.mimes' => 'Format foto harus JPEG, PNG, atau JPG',
+            'foto.max' => 'Ukuran foto maksimal 2MB',
         ]);
+
+        // Handle remove foto checkbox
+        if ($request->has('remove_foto') && $masterBarang->foto) {
+            if (\Storage::disk('public')->exists($masterBarang->foto)) {
+                \Storage::disk('public')->delete($masterBarang->foto);
+            }
+            $masterBarang->foto = null;
+        }
+
+        // Handle foto upload
+        if ($request->hasFile('foto')) {
+            // Delete old photo if exists
+            if ($masterBarang->foto && \Storage::disk('public')->exists($masterBarang->foto)) {
+                \Storage::disk('public')->delete($masterBarang->foto);
+            }
+            
+            $fotoPath = $request->file('foto')->store('items', 'public');
+            $masterBarang->foto = $fotoPath;
+        }
 
         // Update item
         $masterBarang->update([
             'nama_item' => $validated['nama_item'],
-            'deskripsi' => $validated['deskripsi']
+            'deskripsi' => $validated['deskripsi'],
+            'foto' => $masterBarang->foto
         ]);
 
         return redirect()
@@ -128,6 +163,11 @@ class MasterBarangController extends Controller
             // Check if item has related pengaduan
             if ($masterBarang->pengaduans()->count() > 0) {
                 return back()->with('error', 'Item tidak dapat dihapus karena masih memiliki pengaduan terkait');
+            }
+
+            // Delete photo if exists
+            if ($masterBarang->foto && \Storage::disk('public')->exists($masterBarang->foto)) {
+                \Storage::disk('public')->delete($masterBarang->foto);
             }
 
             // Detach all lokasi relationships

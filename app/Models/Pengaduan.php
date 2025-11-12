@@ -23,13 +23,21 @@ class Pengaduan extends Model
         'tgl_selesai',
         'tgl_verifikasi',
         'catatan_admin',
-        'saran_petugas'
+        'saran_petugas',
+        'ditangani_admin',
+        'nama_admin',
+        'ditolak_oleh',
+        'tgl_ditolak',
+        'diproses_oleh',
+        'tgl_mulai_proses'
     ];
 
     protected $dates = [
         'tgl_pengajuan',
         'tgl_selesai',
-        'tgl_verifikasi'
+        'tgl_verifikasi',
+        'tgl_ditolak',
+        'tgl_mulai_proses'
     ];
 
     public function user()

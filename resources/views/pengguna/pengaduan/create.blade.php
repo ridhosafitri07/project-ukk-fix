@@ -139,6 +139,17 @@
                                 <i class="fas fa-spinner fa-spin text-indigo-600"></i>
                             </div>
                         </div>
+                        <div class="mt-3">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" id="other-item-checkbox" class="form-checkbox h-4 w-4 text-indigo-600">
+                                <span class="ml-2 text-sm text-gray-700">Barang Lainnya (tidak ada di daftar)</span>
+                            </label>
+                        </div>
+
+                        <div id="other-item-input" class="mt-3 hidden">
+                            <label class="block text-xs text-gray-600 mb-1">Nama Barang Baru</label>
+                            <input type="text" name="nama_barang_baru" id="nama_barang_baru" value="{{ old('nama_barang_baru') }}" class="block w-full rounded-lg border-2 border-gray-300 px-4 py-2" placeholder="Ketik nama barang baru...">
+                        </div>
                         @error('id_item')
                             <p class="mt-2 text-sm text-red-600 flex items-center">
                                 <i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}
@@ -322,6 +333,24 @@
                     document.getElementById('id_item').value = oldItemId;
                 }
             }, 500);
+        }
+
+        // Toggle other item input
+        const otherCheckbox = document.getElementById('other-item-checkbox');
+        const otherInput = document.getElementById('other-item-input');
+        const itemSelect = document.getElementById('id_item');
+        if (otherCheckbox) {
+            otherCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    otherInput.classList.remove('hidden');
+                    itemSelect.disabled = true;
+                    itemSelect.removeAttribute('required');
+                } else {
+                    otherInput.classList.add('hidden');
+                    itemSelect.disabled = false;
+                    itemSelect.setAttribute('required', 'required');
+                }
+            });
         }
     </script>
 </body>

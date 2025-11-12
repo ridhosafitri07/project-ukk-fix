@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -57,7 +58,7 @@
                     <a href="{{ route('petugas.pengaduan.index') }}" 
                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-700 {{ request()->routeIs('petugas.pengaduan.*') ? 'active' : '' }}">
                         <i class="fas fa-tasks w-5 text-center"></i>
-                        <span x-show="sidebarOpen" class="font-medium">Tugas Pengaduan</span>
+                        <span x-show="sidebarOpen" class="font-medium">Pengaduan Saya</span>
                     </a>
 
                     <a href="{{ route('petugas.riwayat.index') }}" 

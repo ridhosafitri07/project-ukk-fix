@@ -16,16 +16,43 @@
                 <p class="text-sm text-gray-600 mt-1">Daftar pengaduan yang sudah diselesaikan</p>
             </div>
             <div class="flex space-x-2">
-                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center shadow-sm">
+                <button id="toggle-filter" type="button" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center shadow-sm">
                     <i class="fas fa-filter mr-2"></i>
                     Filter
                 </button>
-                <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center shadow-md">
+                <a href="{{ route('petugas.riwayat.export') }}{{ request()->getQueryString() ? ('?' . request()->getQueryString()) : '' }}" 
+                   class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center shadow-md inline-flex items-center">
                     <i class="fas fa-file-export mr-2"></i>
                     Export
-                </button>
+                </a>
             </div>
         </div>
+    </div>
+    
+    {{-- Filter panel (hidden by default) --}}
+    <div id="filter-panel" class="p-6 border-b border-gray-100 bg-white hidden">
+        <form method="GET" action="{{ route('petugas.riwayat.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="text-xs text-gray-600">Dari Tgl</label>
+                <input type="date" name="date_from" value="{{ request('date_from') }}" class="mt-1 block w-full border-gray-200 rounded-md">
+            </div>
+            <div>
+                <label class="text-xs text-gray-600">Sampai Tgl</label>
+                <input type="date" name="date_to" value="{{ request('date_to') }}" class="mt-1 block w-full border-gray-200 rounded-md">
+            </div>
+            <div>
+                <label class="text-xs text-gray-600">Lokasi</label>
+                <input type="text" name="lokasi" value="{{ request('lokasi') }}" placeholder="Nama lokasi atau ruang" class="mt-1 block w-full border-gray-200 rounded-md">
+            </div>
+            <div>
+                <label class="text-xs text-gray-600">Kata kunci</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Judul atau nama pengadu" class="mt-1 block w-full border-gray-200 rounded-md">
+            </div>
+            <div class="md:col-span-4 flex items-center space-x-2 mt-2">
+                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Terapkan</button>
+                <a href="{{ route('petugas.riwayat.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg">Reset</a>
+            </div>
+        </form>
     </div>
     
     <div class="overflow-x-auto">
@@ -117,4 +144,16 @@
         {{ $riwayat->links() }}
     </div>
 </div>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('toggle-filter');
+    var panel = document.getElementById('filter-panel');
+    if (!btn || !panel) return;
+    btn.addEventListener('click', function () {
+        panel.classList.toggle('hidden');
+    });
+});
+</script>
+@endpush
 @endsection

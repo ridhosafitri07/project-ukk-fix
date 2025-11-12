@@ -117,11 +117,11 @@
             </div>
         </div>
 
-        <!-- Total Relasi -->
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
+    <!-- Total Sarpras -->
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm opacity-90 font-medium">Total Relasi</p>
+                    <p class="text-sm opacity-90 font-medium">Total Sarpras</p>
                     <p class="text-4xl font-bold mt-2">{{ $totalRelasi ?? 0 }}</p>
                     <p class="text-xs opacity-75 mt-2">Barang terdistribusi</p>
                 </div>

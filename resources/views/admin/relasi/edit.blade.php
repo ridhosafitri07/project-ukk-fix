@@ -6,11 +6,11 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto">
-    <div class="mb-6">
+            <div class="mb-6">
         <a href="{{ route('admin.relasi.index') }}" 
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition shadow">
             <i class="fas fa-arrow-left mr-2"></i>
-            Kembali ke Daftar Relasi
+            Kembali ke Daftar Sarpras
         </a>
     </div>
 

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Relasi Barang-Ruangan')
-@section('header', 'Relasi Barang-Ruangan')
+@section('title', 'Sarpras Barang-Ruangan')
+@section('header', 'Sarpras Barang-Ruangan')
 @section('subheader', 'Kelola distribusi barang ke lokasi/ruangan')
 
 @section('content')
@@ -30,7 +30,7 @@
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium opacity-90">Total Relasi</p>
+                    <p class="text-sm font-medium opacity-90">Total Sarpras</p>
                     <p class="text-4xl font-bold mt-2">{{ $statistics['total'] }}</p>
                     <p class="text-xs opacity-75 mt-1">Barang terdistribusi</p>
                 </div>
@@ -75,14 +75,14 @@
                 <div>
                     <h3 class="text-xl font-bold text-white flex items-center">
                         <i class="fas fa-sitemap mr-2"></i>
-                        Daftar Relasi Barang-Ruangan
+                        Daftar Sarpras Barang-Ruangan
                     </h3>
                     <p class="text-purple-100 text-sm mt-1">Kelola distribusi barang ke setiap lokasi</p>
                 </div>
-                <a href="{{ route('admin.relasi.create') }}" 
+                    <a href="{{ route('admin.relasi.create') }}" 
                    class="bg-white hover:bg-purple-50 text-purple-600 font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-200 flex items-center space-x-2 w-fit">
                     <i class="fas fa-plus-circle"></i>
-                    <span>Tambah Relasi Baru</span>
+                    <span>Tambah Sarpras Baru</span>
                 </a>
             </div>
         </div>
@@ -204,11 +204,11 @@
                             <td colspan="4" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                                    <p class="text-gray-500 text-lg font-medium">Tidak ada relasi</p>
+                                    <p class="text-gray-500 text-lg font-medium">Tidak ada sarpras</p>
                                     <p class="text-gray-400 text-sm mt-2">Mulai distribusikan barang ke lokasi</p>
                                     <a href="{{ route('admin.relasi.create') }}" 
                                        class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition">
-                                        <i class="fas fa-plus mr-2"></i>Tambah Relasi
+                                        <i class="fas fa-plus mr-2"></i>Tambah Sarpras
                                     </a>
                                 </div>
                             </td>
@@ -247,10 +247,10 @@
 <script>
 function confirmDelete(id, lokasi, barang) {
     Swal.fire({
-        title: 'Hapus Relasi?',
+        title: 'Hapus Sarpras?',
         html: `
             <div class="text-left">
-                <p class="text-gray-700 mb-2">Anda akan menghapus relasi:</p>
+                <p class="text-gray-700 mb-2">Anda akan menghapus sarpras:</p>
                 <div class="bg-gray-50 p-3 rounded-lg">
                     <p class="text-sm"><strong>Lokasi:</strong> ${lokasi}</p>
                     <p class="text-sm"><strong>Barang:</strong> ${barang}</p>

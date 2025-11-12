@@ -127,7 +127,7 @@
                             <p class="text-sm text-yellow-700 font-medium">Perhatian!</p>
                             <p class="text-sm text-yellow-600 mt-1">
                                 Lokasi ini memiliki <span class="font-bold">{{ $masterLokasi->items()->count() }} barang</span> yang terdaftar.
-                                Pastikan perubahan tidak memengaruhi data relasi barang.
+                                Pastikan perubahan tidak memengaruhi data sarpras barang.
                             </p>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Relasi')
-@section('header', 'Tambah Relasi Baru')
+@section('title', 'Tambah Sarpras')
+@section('header', 'Tambah Sarpras Baru')
 @section('subheader', 'Distribusikan barang ke lokasi/ruangan')
 
 @section('content')
@@ -11,7 +11,7 @@
         <a href="{{ route('admin.relasi.index') }}" 
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition shadow">
             <i class="fas fa-arrow-left mr-2"></i>
-            Kembali ke Daftar Relasi
+            Kembali ke Daftar Sarpras
         </a>
     </div>
 
@@ -19,9 +19,9 @@
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-5">
-            <h3 class="text-xl font-bold text-white flex items-center">
+                <h3 class="text-xl font-bold text-white flex items-center">
                 <i class="fas fa-plus-circle mr-2"></i>
-                Form Tambah Relasi Barang-Ruangan
+                Form Tambah Sarpras Barang-Ruangan
             </h3>
             <p class="text-purple-100 text-sm mt-1">Distribusikan barang ke lokasi yang dipilih</p>
         </div>
@@ -37,7 +37,7 @@
                     <div>
                         <p class="text-sm text-blue-700 font-medium">Informasi:</p>
                         <p class="text-sm text-blue-600 mt-1">
-                            Relasi ini akan mencatat distribusi barang ke lokasi tertentu.
+                            Sarpras ini akan mencatat distribusi barang ke lokasi tertentu.
                             Pastikan kombinasi lokasi dan barang belum ada.
                         </p>
                     </div>
@@ -115,7 +115,7 @@
             <div class="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-6">
                 <p class="text-sm font-bold text-purple-800 mb-3 flex items-center">
                     <i class="fas fa-eye mr-2"></i>
-                    Preview Relasi:
+                    Preview Sarpras:
                 </p>
                 <div class="bg-white rounded-lg p-4 shadow-sm space-y-3">
                     <div class="flex items-center justify-between">
@@ -137,10 +137,10 @@
                     <i class="fas fa-times mr-2"></i>
                     Batal
                 </a>
-                <button type="submit" 
+                    <button type="submit" 
                         class="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition duration-200">
                     <i class="fas fa-save mr-2"></i>
-                    Simpan Relasi
+                    Simpan Sarpras
                 </button>
             </div>
         </form>

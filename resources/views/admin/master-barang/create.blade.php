@@ -27,7 +27,7 @@
         </div>
 
         <!-- Form -->
-        <form action="{{ route('admin.master-barang.store') }}" method="POST" class="p-8 space-y-6">
+        <form action="{{ route('admin.master-barang.store') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
             @csrf
 
             <!-- Info Box -->
@@ -92,6 +92,48 @@
                 </p>
             </div>
 
+            <!-- Foto Barang -->
+            <div class="space-y-2">
+                <label for="foto" class="block text-sm font-bold text-gray-700">
+                    <i class="fas fa-image text-indigo-600 mr-2"></i>
+                    Foto Barang <span class="text-gray-400 text-xs">(Opsional)</span>
+                </label>
+                <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-400 transition-colors bg-gray-50">
+                    <div class="space-y-2 text-center">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                        <div class="flex text-sm text-gray-600">
+                            <label for="foto" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none px-3 py-1">
+                                <span>Upload foto</span>
+                                <input id="foto" 
+                                       name="foto" 
+                                       type="file" 
+                                       class="sr-only" 
+                                       accept="image/*"
+                                       onchange="previewFoto(this)">
+                            </label>
+                            <p class="pl-1">atau drag and drop</p>
+                        </div>
+                        <p class="text-xs text-gray-500">PNG, JPG, JPEG max 2MB</p>
+                    </div>
+                </div>
+                @error('foto')
+                    <p class="mt-2 text-sm text-red-600 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ $message }}
+                    </p>
+                @enderror
+                <div id="fotoPreview" class="mt-4 hidden">
+                    <div class="relative inline-block">
+                        <img src="" alt="Preview" class="max-w-xs rounded-lg shadow-md">
+                        <button type="button" 
+                                onclick="removeFoto()" 
+                                class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Preview Card -->
             <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-lg p-6">
                 <p class="text-sm font-bold text-indigo-800 mb-3 flex items-center">
@@ -151,5 +193,43 @@ document.addEventListener('DOMContentLoaded', function() {
         previewDeskripsi.textContent = this.value || 'Tidak ada deskripsi';
     });
 });
+
+function previewFoto(input) {
+    const preview = document.getElementById('fotoPreview');
+    const previewImg = preview.querySelector('img');
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file terlalu besar! Maksimal 2MB');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file type
+        if (!file.type.match('image.*')) {
+            alert('File harus berupa gambar!');
+            input.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeFoto() {
+    const input = document.getElementById('foto');
+    const preview = document.getElementById('fotoPreview');
+    
+    input.value = '';
+    preview.classList.add('hidden');
+}
 </script>
 @endsection

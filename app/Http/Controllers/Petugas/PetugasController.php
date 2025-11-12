@@ -79,32 +79,39 @@ class PetugasController extends Controller
             return redirect()->back()->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
         }
         
-        $pengaduan = Pengaduan::with('user')
+        // Petugas should only see complaints assigned to them (Pengaduan Saya)
+        $pengaduanSaya = Pengaduan::with('user')
             ->where('id_petugas', $petugasId)
             ->whereIn('status', ['Disetujui', 'Diproses'])
             ->orderBy('tgl_pengajuan', 'desc')
             ->paginate(10);
-        
+
         $statistics = [
-            'total' => Pengaduan::where('id_petugas', $petugasId)
+            'tugas_saya' => Pengaduan::where('id_petugas', $petugasId)
                 ->whereIn('status', ['Disetujui', 'Diproses'])
-                ->count(),
-            'disetujui' => Pengaduan::where('id_petugas', $petugasId)
-                ->where('status', 'Disetujui')
                 ->count(),
             'diproses' => Pengaduan::where('id_petugas', $petugasId)
                 ->where('status', 'Diproses')
                 ->count(),
+            'selesai' => Pengaduan::where('id_petugas', $petugasId)
+                ->where('status', 'Selesai')
+                ->count(),
         ];
-        
-        return view('petugas.pengaduan.index', compact('pengaduan', 'statistics'));
+
+        return view('petugas.pengaduan.index', compact('pengaduanSaya', 'statistics'));
     }
     
     public function pengaduanShow(Pengaduan $pengaduan)
     {
         $petugasId = $this->getPetugasId();
         
-        if ($pengaduan->id_petugas != $petugasId) {
+    // Petugas dapat mengakses pengaduan ketika:
+    // - Sudah Disetujui dan belum ada petugas yang mengambilnya (tersedia untuk diambil)
+    // - Sudah ditugaskan ke petugas tersebut
+    $canAccess = ($pengaduan->status === 'Disetujui' && !$pengaduan->id_petugas) ||
+             ($pengaduan->id_petugas == $petugasId);
+        
+        if (!$canAccess) {
             return redirect()->route('petugas.pengaduan.index')
                 ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');
         }
@@ -117,25 +124,81 @@ class PetugasController extends Controller
     {
         $petugasId = $this->getPetugasId();
         
-        if ($pengaduan->id_petugas != $petugasId) {
+        // Validasi transisi status
+        $currentStatus = $pengaduan->status;
+        $newStatus = $request->status;
+        
+        // Aturan transisi status untuk petugas:
+        // Petugas TIDAK BISA menyetujui atau menolak aduan yang berstatus 'Diajukan'.
+        // Petugas hanya boleh:
+        // Disetujui -> Diproses/Selesai
+        // Diproses -> Selesai
+
+        if ($currentStatus === 'Diajukan') {
+            // Petugas cannot act on 'Diajukan' status
+            return back()->with('error', 'Anda tidak dapat menyetujui atau menolak pengaduan. Silakan menunggu keputusan Admin.');
+        }
+        
+        if ($currentStatus === 'Disetujui' && !in_array($newStatus, ['Diproses', 'Selesai'])) {
+            return back()->with('error', 'Pengaduan yang sudah disetujui hanya bisa dimulai proses atau diselesaikan!');
+        }
+        
+        if ($currentStatus === 'Diproses' && $newStatus !== 'Selesai') {
+            return back()->with('error', 'Pengaduan yang sedang diproses hanya bisa diselesaikan!');
+        }
+        
+        // Untuk Diproses/Selesai, harus cek ownership
+        if (in_array($newStatus, ['Diproses', 'Selesai']) && 
+            $pengaduan->id_petugas && 
+            $pengaduan->id_petugas != $petugasId) {
             return redirect()->route('petugas.pengaduan.index')
                 ->with('error', 'Anda tidak memiliki akses ke pengaduan ini.');
         }
         
         $request->validate([
             'status' => 'required|in:Diproses,Selesai',
-            'saran_petugas' => 'nullable|string|max:255'
+            'saran_petugas' => 'nullable|string|max:500'
+        ], [
+            'status.required' => 'Status harus dipilih',
+            'status.in' => 'Status tidak valid',
+            'saran_petugas.max' => 'Saran petugas maksimal 500 karakter',
         ]);
         
         DB::beginTransaction();
         try {
-            $pengaduan->status = $request->status;
             if ($request->saran_petugas) {
                 $pengaduan->saran_petugas = $request->saran_petugas;
             }
             
-            if ($request->status === 'Selesai') {
+            // STAGE 2: Mulai Proses (dari status Disetujui)
+            elseif ($newStatus === 'Diproses') {
+                $pengaduan->status = 'Diproses';
+                $pengaduan->tgl_mulai_proses = now();
+                
+                // PENTING: Kolom petugas baru diisi saat klik "Mulai Proses"
+                $pengaduan->id_petugas = $petugasId;
+                
+                // Reset flag admin karena sekarang petugas yang menangani
+                $pengaduan->ditangani_admin = false;
+                $pengaduan->nama_admin = null;
+                
+                $petugasNama = Auth::user()->nama_pengguna;
+                $pengaduan->diproses_oleh = $petugasNama;
+                
+                $message = "Proses perbaikan telah dimulai oleh {$petugasNama}. Pengaduan sekarang ditangani oleh Anda.";
+            }
+            
+            // STAGE 2: Selesai (dari status Disetujui atau Diproses)
+            elseif ($newStatus === 'Selesai') {
+                $pengaduan->status = 'Selesai';
                 $pengaduan->tgl_selesai = now();
+                
+                // Jika langsung selesai dari Disetujui (tanpa proses), isi kolom petugas
+                if ($currentStatus === 'Disetujui' && !$pengaduan->id_petugas) {
+                    $pengaduan->id_petugas = $petugasId;
+                }
+                
+                $message = 'Pengaduan telah diselesaikan.';
             }
             
             $pengaduan->save();
@@ -143,10 +206,10 @@ class PetugasController extends Controller
             DB::commit();
             return redirect()
                 ->route('petugas.pengaduan.show', $pengaduan)
-                ->with('success', 'Status pengaduan berhasil diperbarui');
+                ->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memperbarui status');
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui status: ' . $e->getMessage());
         }
     }
     
@@ -224,13 +287,97 @@ class PetugasController extends Controller
             return redirect()->back()->with('error', 'Akun petugas tidak ditemukan. Hubungi administrator.');
         }
         
-        $riwayat = Pengaduan::with('user')
+        // Apply optional filters from query string
+        $query = Pengaduan::with('user')
             ->where('id_petugas', $petugasId)
-            ->where('status', 'Selesai')
-            ->orderBy('tgl_selesai', 'desc')
-            ->paginate(10);
+            ->where('status', 'Selesai');
+
+        // Date range filter: date_from, date_to (format: yyyy-mm-dd)
+        if ($dateFrom = request()->get('date_from')) {
+            $query->whereDate('tgl_selesai', '>=', $dateFrom);
+        }
+        if ($dateTo = request()->get('date_to')) {
+            $query->whereDate('tgl_selesai', '<=', $dateTo);
+        }
+
+        // Lokasi filter (partial match)
+        if ($lokasi = request()->get('lokasi')) {
+            $query->where('lokasi', 'like', "%{$lokasi}%");
+        }
+
+        // Keyword search in judul or pengadu name
+        if ($q = request()->get('q')) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nama_pengaduan', 'like', "%{$q}%")
+                    ->orWhereHas('user', function ($u) use ($q) {
+                        $u->where('nama_pengguna', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        $riwayat = $query->orderBy('tgl_selesai', 'desc')->paginate(10)->appends(request()->query());
         
         return view('petugas.riwayat.index', compact('riwayat'));
+    }
+
+    /**
+     * Export filtered riwayat as CSV
+     */
+    public function riwayatExport()
+    {
+        $petugasId = $this->getPetugasId();
+        $query = Pengaduan::with('user')
+            ->where('id_petugas', $petugasId)
+            ->where('status', 'Selesai');
+
+        if ($dateFrom = request()->get('date_from')) {
+            $query->whereDate('tgl_selesai', '>=', $dateFrom);
+        }
+        if ($dateTo = request()->get('date_to')) {
+            $query->whereDate('tgl_selesai', '<=', $dateTo);
+        }
+        if ($lokasi = request()->get('lokasi')) {
+            $query->where('lokasi', 'like', "%{$lokasi}%");
+        }
+        if ($q = request()->get('q')) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nama_pengaduan', 'like', "%{$q}%")
+                    ->orWhereHas('user', function ($u) use ($q) {
+                        $u->where('nama_pengguna', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        $items = $query->orderBy('tgl_selesai', 'desc')->get();
+
+        $filename = 'riwayat_pengaduan_' . date('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($items) {
+            $out = fopen('php://output', 'w');
+            // Header
+            fputcsv($out, ['ID', 'Tgl Pengajuan', 'Pengadu', 'Judul', 'Lokasi', 'Tgl Selesai', 'Petugas']);
+
+            foreach ($items as $item) {
+                $row = [
+                    $item->id_pengaduan,
+                    $item->tgl_pengajuan ? date('Y-m-d', strtotime($item->tgl_pengajuan)) : '',
+                    $item->user->nama_pengguna ?? '',
+                    $item->nama_pengaduan ?? '',
+                    $item->lokasi ?? '',
+                    $item->tgl_selesai ? date('Y-m-d', strtotime($item->tgl_selesai)) : '',
+                    optional($item->petugas)->nama ?? '',
+                ];
+                fputcsv($out, $row);
+            }
+
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
     
     public function riwayatShow(Pengaduan $pengaduan)

@@ -52,6 +52,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [AdminPengaduanController::class, 'index'])->name('admin.pengaduan.index');
             Route::get('/{pengaduan}', [AdminPengaduanController::class, 'show'])->name('admin.pengaduan.show');
             Route::put('/{pengaduan}/status', [AdminPengaduanController::class, 'updateStatus'])->name('admin.pengaduan.update-status');
+            // Approve temporary item (promote to master items)
+            Route::post('/temporary-item/{id}/approve', [AdminPengaduanController::class, 'approveTemporaryItem'])->name('admin.pengaduan.approve-temporary');
+            Route::get('/export/excel', [AdminPengaduanController::class, 'exportExcel'])->name('admin.pengaduan.export-excel');
+            Route::get('/export/pdf', [AdminPengaduanController::class, 'exportPdf'])->name('admin.pengaduan.export-pdf');
         });
 
         // Laporan Routes
@@ -103,6 +107,8 @@ Route::middleware('auth')->group(function () {
         Route::prefix('riwayat')->group(function () {
             Route::get('/', [PetugasController::class, 'riwayatIndex'])->name('petugas.riwayat.index');
             Route::get('/{pengaduan}', [PetugasController::class, 'riwayatShow'])->name('petugas.riwayat.show');
+            // Export filtered riwayat (CSV)
+            Route::get('/export', [PetugasController::class, 'riwayatExport'])->name('petugas.riwayat.export');
         });
     });
 
@@ -134,5 +140,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengaduan/{pengaduan}/edit', [PengaduanController::class, 'edit'])->name('pengaduan.edit');
         Route::put('/pengaduan/{pengaduan}', [PengaduanController::class, 'update'])->name('pengaduan.update');
         Route::delete('/pengaduan/{pengaduan}', [PengaduanController::class, 'destroy'])->name('pengaduan.destroy');
+
+        // Riwayat Pengaduan (for pengguna)
+        Route::prefix('riwayat')->group(function () {
+            Route::get('/', [PengaduanController::class, 'riwayatIndex'])->name('pengguna.riwayat.index');
+            Route::get('/{pengaduan}', [PengaduanController::class, 'riwayatShow'])->name('pengguna.riwayat.show');
+            Route::get('/export', [PengaduanController::class, 'riwayatExport'])->name('pengguna.riwayat.export');
+        });
     });
 });

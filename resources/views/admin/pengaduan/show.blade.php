@@ -97,11 +97,35 @@
                          onclick="window.open(this.src, '_blank')">
                 </div>
                 @endif
+                @if($pengaduan->temporary_items && $pengaduan->temporary_items->count())
+                <div class="mt-4">
+                    <h4 class="text-sm font-semibold text-gray-600">Permintaan Barang Baru</h4>
+                    <div class="mt-2 space-y-3">
+                        @foreach($pengaduan->temporary_items as $tmp)
+                        <div class="p-3 border rounded-lg flex items-start justify-between">
+                            <div>
+                                <p class="font-semibold">{{ $tmp->nama_barang_baru }}</p>
+                                <p class="text-xs text-gray-500">Lokasi: {{ $tmp->lokasi_barang_baru }}</p>
+                                <p class="text-sm text-gray-700 mt-2">{{ Str::limit($tmp->alasan_permintaan, 200) }}</p>
+                            </div>
+                            <div class="ml-4 text-right">
+                                <form method="POST" action="{{ route('admin.pengaduan.approve-temporary', $tmp->id_item ?? $tmp->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="catatan_admin" value="Disetujui dan ditambahkan ke master item">
+                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg">Approve</button>
+                                </form>
+                                <p class="text-xs text-gray-500 mt-2">Status: {{ $tmp->status_permintaan }}</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
-        <!-- Form Update Status -->
-        @if($pengaduan->status === 'Diajukan')
+        <!-- Form Update Status - Admin hanya bisa action di Diajukan & Disetujui -->
+        @if(in_array($pengaduan->status, ['Diajukan', 'Disetujui']))
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="p-6 bg-gradient-to-r from-purple-500 to-pink-600">
                 <h3 class="text-lg font-bold text-white flex items-center">
@@ -115,78 +139,106 @@
                     @method('PUT')
 
                     <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">Pilih Status</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative flex items-center p-4 bg-green-50 border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-100 transition-colors">
-                                    <input type="radio" name="status" value="Disetujui" class="form-radio text-green-600 h-5 w-5" required>
-                                    <span class="ml-3 flex items-center">
-                                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                                        <span class="text-sm font-semibold text-green-800">Setujui</span>
-                                    </span>
-                                </label>
-                                <label class="relative flex items-center p-4 bg-red-50 border-2 border-red-200 rounded-lg cursor-pointer hover:bg-red-100 transition-colors">
-                                    <input type="radio" name="status" value="Ditolak" class="form-radio text-red-600 h-5 w-5" required>
-                                    <span class="ml-3 flex items-center">
-                                        <i class="fas fa-times-circle text-red-600 mr-2"></i>
-                                        <span class="text-sm font-semibold text-red-800">Tolak</span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Pilih Petugas (Hanya muncul jika Disetujui) -->
-                        <div id="petugas-section" style="display: none;" class="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
-                            <h4 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
-                                <i class="fas fa-user-cog mr-2"></i>
-                                Pilih Petugas Yang Sesuai
-                            </h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <label for="id_petugas" class="block text-sm font-bold text-gray-700 mb-2">
-                                        Pilih Petugas <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="id_petugas" name="id_petugas" required
-                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                                        <option value="">-- Pilih Petugas --</option>
-                                        @forelse($petugasList as $petugas)
-                                        <option value="{{ $petugas->id_petugas }}" 
-                                                data-nama="{{ $petugas->nama_pengguna }}"
-                                                data-gender="{{ $petugas->gender }}"
-                                                data-telp="{{ $petugas->telp }}"
-                                                data-pekerjaan="{{ $petugas->pekerjaan ?? 'Tidak Ditentukan' }}">
-                                            {{ $petugas->nama_pengguna }} - {{ $petugas->pekerjaan ?? 'Tidak Ditentukan' }}
-                                        </option>
-                                        @empty
-                                        <option value="" disabled>Tidak ada petugas yang tersedia</option>
-                                        @endforelse
-                                    </select>
-                                    @if($petugasList->isEmpty())
-                                    <p class="mt-2 text-sm text-red-600">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        Belum ada akun petugas yang terdaftar
-                                    </p>
-                                    @endif
-                                </div>
-                                
-                                <!-- Info Petugas -->
-                                <div id="petugas-info" class="hidden">
-                                    <div class="bg-white p-4 rounded-lg border border-blue-200">
-                                        <h5 class="text-sm font-semibold text-gray-600 mb-2">Informasi Petugas:</h5>
-                                        <div class="space-y-2" id="petugas-detail">
-                                            <!-- Diisi oleh JavaScript -->
-                                        </div>
+                        <!-- STAGE 1: Status Diajukan - Show only Setujui & Tolak -->
+                        @if($pengaduan->status === 'Diajukan')
+                        <div class="mb-6">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-info-circle text-yellow-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-yellow-700">
+                                            <strong>Tahap Persetujuan:</strong> Pengaduan ini menunggu keputusan untuk disetujui atau ditolak.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Pilih Keputusan</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="relative flex items-center p-5 bg-green-50 border-2 border-green-300 rounded-lg cursor-pointer hover:bg-green-100 hover:border-green-400 transition-all group">
+                                    <input type="radio" name="status" value="Disetujui" class="form-radio text-green-600 h-6 w-6" required onchange="togglePetugasSection(true)">
+                                    <span class="ml-3 flex items-center">
+                                        <i class="fas fa-check-circle text-green-600 text-2xl mr-3 group-hover:scale-110 transition-transform"></i>
+                                        <div>
+                                            <span class="text-base font-bold text-green-800 block">Setujui Pengaduan</span>
+                                            <span class="text-xs text-green-600">Pengaduan akan diproses lebih lanjut</span>
+                                        </div>
+                                    </span>
+                                </label>
+                                <label class="relative flex items-center p-5 bg-red-50 border-2 border-red-300 rounded-lg cursor-pointer hover:bg-red-100 hover:border-red-400 transition-all group">
+                                    <input type="radio" name="status" value="Ditolak" class="form-radio text-red-600 h-6 w-6" required onchange="togglePetugasSection(false)">
+                                    <span class="ml-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 text-2xl mr-3 group-hover:scale-110 transition-transform"></i>
+                                        <div>
+                                            <span class="text-base font-bold text-red-800 block">Tolak Pengaduan</span>
+                                            <span class="text-xs text-red-600">Pengaduan tidak akan diproses</span>
+                                        </div>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
 
-                        <div>
-                            <p class="text-xs text-gray-500 mt-2">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Petugas yang dipilih akan mendapatkan tugas ini
+                        <!-- Pilih Petugas (Opsional - Only when Disetujui) -->
+                        <div id="petugas-section" style="display: none;" class="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+                            <h4 class="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                                <i class="fas fa-user-cog mr-2"></i>
+                                Penugasan Petugas (Opsional)
+                            </h4>
+                            <p class="text-sm text-blue-600 mb-4">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                Pilih petugas tertentu atau kosongkan agar semua petugas dapat mengambil tugas ini.
                             </p>
+                            <div>
+                                <label for="id_petugas" class="block text-sm font-bold text-gray-700 mb-2">
+                                    Petugas yang Ditugaskan
+                                </label>
+                                <select id="id_petugas" name="id_petugas"
+                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">-- Tidak Assign (Semua Petugas Dapat Mengambil) --</option>
+                                    @foreach($petugasList as $petugas)
+                                    <option value="{{ $petugas->id_petugas }}">
+                                        {{ $petugas->nama_pengguna }} - {{ $petugas->pekerjaan ?? 'Tidak Ditentukan' }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
+                        @endif
+
+                        <!-- Status Disetujui atau Diproses: Admin hanya bisa Tolak (batalkan) -->
+                        @if($pengaduan->status === 'Disetujui')
+                        <div class="mb-6">
+                            <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-check-circle text-green-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-green-700">
+                                            <strong>Pengaduan Disetujui:</strong> Pengaduan ini telah ditugaskan ke petugas. 
+                                            Petugas akan memproses lebih lanjut.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Tindakan (Opsional)</label>
+                            <div class="max-w-md">
+                                <label class="relative flex items-center p-5 bg-red-50 border-2 border-red-300 rounded-lg cursor-pointer hover:bg-red-100 hover:border-red-400 transition-all group">
+                                    <input type="radio" name="status" value="Ditolak" class="form-radio text-red-600 h-6 w-6" required>
+                                    <span class="ml-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 text-2xl mr-3 group-hover:scale-110 transition-transform"></i>
+                                        <div>
+                                            <span class="text-base font-bold text-red-800 block">Batalkan/Tolak</span>
+                                            <span class="text-xs text-red-600">Batalkan persetujuan jika ada kesalahan</span>
+                                        </div>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        @endif
 
                         <div>
                             <label for="catatan_admin" class="block text-sm font-bold text-gray-700 mb-2">
@@ -194,12 +246,13 @@
                             </label>
                             <textarea id="catatan_admin" name="catatan_admin" rows="4"
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                    placeholder="Tambahkan catatan untuk pengaduan ini..." ></textarea>
+                                    placeholder="Tambahkan catatan untuk pengaduan ini..." required></textarea>
                         </div>
 
                         <div class="flex justify-end space-x-3">
                             <button type="button" onclick="window.history.back()"
                                     class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>
                                 Batal
                             </button>
                             <button type="submit"
@@ -223,7 +276,25 @@
             </div>
             <div class="p-6">
                 <dl class="grid grid-cols-1 gap-4">
-                    @if($pengaduan->id_petugas && $pengaduan->petugas)
+                    @if($pengaduan->ditangani_admin)
+                    {{-- Ditangani oleh Admin --}}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Ditangani Oleh</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-shield text-purple-500 mr-2"></i>
+                                <span class="font-semibold">Admin: {{ $pengaduan->nama_admin }}</span>
+                            </div>
+                            <div class="flex items-center mt-1 ml-6">
+                                <i class="fas fa-crown text-purple-500 mr-2 text-xs"></i>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
+                                    Administrator
+                                </span>
+                            </div>
+                        </dd>
+                    </div>
+                    @elseif($pengaduan->id_petugas && $pengaduan->petugas)
+                    {{-- Ditangani oleh Petugas --}}
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Petugas yang Ditugaskan</dt>
                         <dd class="mt-1 text-sm text-gray-900">
@@ -385,80 +456,12 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const radios = document.querySelectorAll('input[name="status"]');
+// Toggle Petugas Section (hanya untuk status Diajukan)
+function togglePetugasSection(show) {
     const petugasSection = document.getElementById('petugas-section');
-    const petugasSelect = document.getElementById('id_petugas');
-    const petugasInfo = document.getElementById('petugas-info');
-    const petugasDetail = document.getElementById('petugas-detail');
-    
-    // Menampilkan/menyembunyikan bagian petugas
-    radios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'Disetujui') {
-                petugasSection.style.display = 'block';
-                petugasSelect.setAttribute('required', 'required');
-            } else {
-                petugasSection.style.display = 'none';
-                petugasSelect.removeAttribute('required');
-                petugasSelect.value = '';
-                petugasInfo.classList.add('hidden');
-            }
-        });
-    });
-
-    // Menampilkan informasi petugas yang dipilih
-    petugasSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        if (this.value) {
-            const nama = selectedOption.dataset.nama;
-            const gender = selectedOption.dataset.gender === 'L' ? 'Laki-laki' : 'Perempuan';
-            const telp = selectedOption.dataset.telp;
-            const pekerjaan = selectedOption.dataset.pekerjaan;
-            
-            petugasDetail.innerHTML = `
-                <div class="flex items-center text-gray-700">
-                    <i class="fas fa-user mr-2 text-blue-500"></i>
-                    <span class="font-medium">${nama}</span>
-                </div>
-                <div class="flex items-center text-gray-700">
-                    <i class="fas fa-briefcase mr-2 text-green-500"></i>
-                    <span class="font-semibold text-green-700">${pekerjaan}</span>
-                </div>
-                <div class="flex items-center text-gray-700">
-                    <i class="fas fa-venus-mars mr-2 text-purple-500"></i>
-                    <span>${gender}</span>
-                </div>
-                ${telp ? `
-                <div class="flex items-center text-gray-700">
-                    <i class="fas fa-phone mr-2 text-orange-500"></i>
-                    <span>${telp}</span>
-                </div>
-                ` : ''}
-            `;
-            petugasInfo.classList.remove('hidden');
-        } else {
-            petugasInfo.classList.add('hidden');
-        }
-    });
-});
-document.addEventListener('DOMContentLoaded', function() {
-    const statusRadios = document.querySelectorAll('input[name="status"]');
-    const petugasSection = document.getElementById('petugas-section');
-    const petugasSelect = document.getElementById('id_petugas');
-    
-    statusRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'Disetujui') {
-                petugasSection.style.display = 'block';
-                petugasSelect.required = true;
-            } else {
-                petugasSection.style.display = 'none';
-                petugasSelect.required = false;
-                petugasSelect.value = '';
-            }
-        });
-    });
-});
+    if (petugasSection) {
+        petugasSection.style.display = show ? 'block' : 'none';
+    }
+}
 </script>
 @endsection

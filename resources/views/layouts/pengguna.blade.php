@@ -60,6 +60,12 @@
                         <span x-show="sidebarOpen" class="font-medium">Pengaduan Saya</span>
                     </a>
 
+                    <a href="{{ route('pengguna.riwayat.index') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-700 {{ request()->routeIs('pengguna.riwayat.*') ? 'active' : '' }}">
+                        <i class="fas fa-history w-5 text-center"></i>
+                        <span x-show="sidebarOpen" class="font-medium">Riwayat</span>
+                    </a>
+
                     <div x-show="sidebarOpen" class="my-4 border-t border-slate-200"></div>
 
                     <a href="{{ route('profile.index') }}" 

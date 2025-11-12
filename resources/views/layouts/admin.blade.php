@@ -103,7 +103,7 @@
                             <a href="{{ route('admin.relasi.index') }}" 
                                class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition {{ request()->routeIs('admin.relasi.*') ? 'bg-slate-100 font-semibold' : '' }}">
                                 <i class="fas fa-link w-4"></i>
-                                <span>Relasi</span>
+                                <span>Sarpras</span>
                             </a>
                         </div>
                     </div>

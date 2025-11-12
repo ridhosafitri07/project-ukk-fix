@@ -179,8 +179,8 @@
         </div>
         @endif
 
-        <!-- Form Update Status -->
-        @if($pengaduan->status !== 'Selesai')
+        <!-- Form Update Status - PROGRESSIVE UI -->
+        @if(in_array($pengaduan->status, ['Diajukan', 'Disetujui', 'Diproses']))
         <div class="bg-white rounded-lg md:rounded-xl shadow-md overflow-hidden">
             <div class="p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-600">
                 <h3 class="text-base md:text-lg font-bold text-white flex items-center">
@@ -189,51 +189,133 @@
                 </h3>
             </div>
             <div class="p-4 md:p-6">
-                <form action="{{ route('petugas.pengaduan.update-status', $pengaduan) }}" method="POST" class="space-y-4 md:space-y-6">
+                <form id="updateStatusForm" action="{{ route('petugas.pengaduan.update-status', $pengaduan) }}" method="POST" class="space-y-4 md:space-y-6">
                     @csrf
                     @method('PUT')
+                    
+                    <input type="hidden" name="status" id="status-input" value="">
 
                     <div class="space-y-4 md:space-y-6">
-                        <div>
-                            <label class="block text-xs md:text-sm font-bold text-gray-700 mb-2 md:mb-3">Pilih Status</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                <label class="relative flex items-center p-3 md:p-4 bg-blue-50 border-2 border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
-                                    <input type="radio" name="status" value="Diproses" class="form-radio text-blue-600 h-4 w-4 md:h-5 md:w-5 flex-shrink-0" required 
-                                           {{ $pengaduan->status == 'Diproses' ? 'checked' : '' }}>
-                                    <span class="ml-2 md:ml-3 flex items-center">
-                                        <i class="fas fa-cog text-blue-600 mr-2 text-sm md:text-base"></i>
-                                        <span class="text-xs md:text-sm font-semibold text-blue-800">Sedang Diproses</span>
-                                    </span>
-                                </label>
-                                <label class="relative flex items-center p-3 md:p-4 bg-green-50 border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-100 transition-colors">
-                                    <input type="radio" name="status" value="Selesai" class="form-radio text-green-600 h-4 w-4 md:h-5 md:w-5 flex-shrink-0" required>
-                                    <span class="ml-2 md:ml-3 flex items-center">
-                                        <i class="fas fa-check-circle text-green-600 mr-2 text-sm md:text-base"></i>
-                                        <span class="text-xs md:text-sm font-semibold text-green-800">Selesai</span>
-                                    </span>
-                                </label>
+                        <!-- STAGE 1: Status Diajukan - Petugas cannot approve/decline -->
+                        @if($pengaduan->status === 'Diajukan')
+                        <div class="mb-4 md:mb-6">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 md:p-4 mb-4 md:mb-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-info-circle text-yellow-400 text-sm md:text-base"></i>
+                                    </div>
+                                    <div class="ml-2 md:ml-3">
+                                        <p class="text-xs md:text-sm text-yellow-700">
+                                            <strong>Tahap Persetujuan:</strong> Pengaduan ini masih menunggu keputusan Admin. Anda tidak dapat menyetujui atau menolak.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        @endif
+
+                        <!-- STAGE 2: Status Disetujui - Show Action Buttons -->
+                        @if($pengaduan->status === 'Disetujui')
+                        <div class="mb-4 md:mb-6">
+                            <div class="bg-green-50 border-l-4 border-green-400 p-3 md:p-4 mb-4 md:mb-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-check-circle text-green-400 text-sm md:text-base"></i>
+                                    </div>
+                                    <div class="ml-2 md:ml-3">
+                                        <p class="text-xs md:text-sm text-green-700">
+                                            <strong>Pengaduan Disetujui:</strong> Klik tombol di bawah untuk memulai proses atau menyelesaikan langsung.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Tombol Mulai Proses -->
+                                <button type="button" onclick="confirmAction('Diproses')"
+                                        class="group relative overflow-hidden p-6 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                                    <div class="relative z-10 text-white">
+                                        <div class="flex items-center justify-center mb-3">
+                                            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-play text-3xl group-hover:animate-pulse"></i>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-bold text-center mb-2">Mulai Proses</h3>
+                                        <p class="text-sm text-center text-blue-100">
+                                            Ambil tugas ini dan mulai kerjakan perbaikan
+                                        </p>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-800/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </button>
+
+                                <!-- Tombol Selesai Langsung -->
+                                <button type="button" onclick="confirmAction('Selesai')"
+                                        class="group relative overflow-hidden p-6 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                                    <div class="relative z-10 text-white">
+                                        <div class="flex items-center justify-center mb-3">
+                                            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-check-double text-3xl group-hover:scale-110 transition-transform"></i>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-bold text-center mb-2">Tandai Selesai</h3>
+                                        <p class="text-sm text-center text-purple-100">
+                                            Pengaduan sudah selesai ditangani
+                                        </p>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-purple-800/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </button>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- STAGE 3: Status Diproses - Show Selesai Button -->
+                        @if($pengaduan->status === 'Diproses')
+                        <div class="mb-4 md:mb-6">
+                            <div class="bg-blue-50 border-l-4 border-blue-400 p-3 md:p-4 mb-4 md:mb-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-cog fa-spin text-blue-400 text-sm md:text-base"></i>
+                                    </div>
+                                    <div class="ml-2 md:ml-3">
+                                        <p class="text-xs md:text-sm text-blue-700">
+                                            <strong>Sedang Diproses:</strong> Setelah perbaikan selesai, klik tombol di bawah.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="max-w-md mx-auto">
+                                <!-- Tombol Selesai -->
+                                <button type="button" onclick="confirmAction('Selesai')"
+                                        class="group relative overflow-hidden w-full p-8 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                                    <div class="relative z-10 text-white">
+                                        <div class="flex items-center justify-center mb-4">
+                                            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-check-circle text-4xl group-hover:scale-110 transition-transform"></i>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-2xl font-bold text-center mb-2">Selesaikan Tugas</h3>
+                                        <p class="text-sm text-center text-purple-100">
+                                            Perbaikan telah selesai dilakukan
+                                        </p>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-purple-800/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </button>
+                            </div>
+                        </div>
+                        @endif
 
                         <div>
                             <label for="saran_petugas" class="block text-xs md:text-sm font-bold text-gray-700 mb-2">
-                                Saran/Keterangan Petugas
+                                Saran/Keterangan Petugas (Opsional)
                             </label>
                             <textarea id="saran_petugas" name="saran_petugas" rows="4"
-                                    class="w-full px-3 py-2 md:px-4 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                    class="w-full px-3 py-2 md:px-4 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                                     placeholder="Tambahkan saran atau keterangan pekerjaan...">{{ old('saran_petugas', $pengaduan->saran_petugas) }}</textarea>
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row justify-end gap-2 md:gap-3">
-                            <button type="button" onclick="window.history.back()"
-                                    class="w-full sm:w-auto px-4 py-2 md:px-6 md:py-3 bg-gray-100 text-gray-700 rounded-lg text-sm md:text-base font-semibold hover:bg-gray-200 transition-colors">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                    class="w-full sm:w-auto px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg text-sm md:text-base font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center justify-center">
-                                <i class="fas fa-save mr-2 text-sm md:text-base"></i>
-                                Update Status
-                            </button>
+                            <p class="text-xs text-gray-500 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Catatan ini akan disimpan bersama dengan status yang dipilih
+                            </p>
                         </div>
                     </div>
                 </form>
@@ -344,4 +426,67 @@
         </div>
     </div>
 </div>
+
+<script>
+function confirmAction(status) {
+    let message = '';
+    let icon = '';
+    let confirmButtonText = '';
+    let confirmButtonColor = '';
+    
+    if (status === 'Disetujui') {
+        message = 'Apakah Anda yakin ingin menyetujui pengaduan ini? Pengaduan akan siap untuk diproses.';
+        icon = 'question';
+        confirmButtonText = 'Ya, Setujui!';
+        confirmButtonColor = '#10B981';
+    } else if (status === 'Ditolak') {
+        message = 'Apakah Anda yakin ingin menolak pengaduan ini? Pengaduan tidak akan diproses.';
+        icon = 'warning';
+        confirmButtonText = 'Ya, Tolak!';
+        confirmButtonColor = '#EF4444';
+    } else if (status === 'Diproses') {
+        message = 'Anda akan mengambil tugas ini dan memulai proses perbaikan. Lanjutkan?';
+        icon = 'question';
+        confirmButtonText = 'Ya, Mulai Proses!';
+        confirmButtonColor = '#3B82F6';
+    } else if (status === 'Selesai') {
+        message = 'Tandai pengaduan ini sebagai selesai?';
+        icon = 'question';
+        confirmButtonText = 'Ya, Sudah Selesai!';
+        confirmButtonColor = '#A855F7';
+    }
+    
+    Swal.fire({
+        title: 'Konfirmasi',
+        text: message,
+        icon: icon,
+        showCancelButton: true,
+        confirmButtonColor: confirmButtonColor,
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: confirmButtonText,
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Set status value
+            document.getElementById('status-input').value = status;
+            
+            // Submit form
+            document.getElementById('updateStatusForm').submit();
+            
+            // Show loading
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Mohon tunggu sebentar',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+    });
+}
+</script>
 @endsection

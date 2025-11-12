@@ -175,7 +175,7 @@
                                 </th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                                     <i class="fas fa-link mr-1"></i>
-                                    ID Relasi
+                                    ID Sarpras
                                 </th>
                             </tr>
                         </thead>
@@ -242,12 +242,12 @@
                     </h3>
                     <p class="text-gray-500 mb-6 max-w-md mx-auto">
                         Lokasi ini belum memiliki barang yang terdaftar. Tambahkan barang melalui menu 
-                        <span class="font-bold text-indigo-600">Relasi Barang-Ruangan</span>.
+                        <span class="font-bold text-indigo-600">Sarpras Barang-Ruangan</span>.
                     </p>
                     <div class="flex items-center justify-center space-x-3">
                         <i class="fas fa-info-circle text-blue-500"></i>
                         <p class="text-sm text-gray-600">
-                            Gunakan menu <span class="font-semibold">Manajemen Sarpras → Relasi Barang-Ruangan</span> untuk menambahkan barang ke lokasi ini
+                            Gunakan menu <span class="font-semibold">Manajemen Sarpras → Sarpras Barang-Ruangan</span> untuk menambahkan barang ke lokasi ini
                         </p>
                     </div>
                 </div>

@@ -15,6 +15,7 @@ class PengaduanController extends Controller
     public function index()
     {
         $pengaduans = Pengaduan::where('id_user', Auth::id())
+            ->with('temporary_items')  // Load temporary items untuk badge di index
             ->orderBy('tgl_pengajuan', 'desc')
             ->get();
         return view('pengguna.pengaduan.index', compact('pengaduans'));
@@ -99,13 +100,10 @@ class PengaduanController extends Controller
             if (empty($validated['id_item']) && !empty(trim($validated['nama_barang_baru'] ?? ''))) {
                 \App\Models\TemporaryItem::create([
                     'id_pengaduan' => $pengaduan->id_pengaduan,
-                    'id_petugas' => null,
                     'nama_barang_baru' => $validated['nama_barang_baru'],
                     'lokasi_barang_baru' => $lokasi->nama_lokasi,
                     'alasan_permintaan' => $validated['deskripsi'],
-                    'foto_kerusakan' => $fotoPath,
-                    'status_permintaan' => 'Menunggu Persetujuan',
-                    'tanggal_permintaan' => now()
+                    'deskripsi_barang_baru' => $validated['deskripsi']
                 ]);
             }
 
@@ -126,6 +124,10 @@ class PengaduanController extends Controller
         if ($pengaduan->id_user !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
+        
+        // Load temporary items untuk ditampilkan di view
+        $pengaduan->load('temporary_items');
+        
         return view('pengguna.pengaduan.show', compact('pengaduan'));
     }
 

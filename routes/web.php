@@ -11,11 +11,8 @@ use App\Http\Controllers\ProfileController;
 
 // Public routes
 Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect('/dashboard');
-    }
-    return redirect('/login');
-});
+    return view('landing');
+})->name('landing');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -54,6 +51,8 @@ Route::middleware('auth')->group(function () {
             Route::put('/{pengaduan}/status', [AdminPengaduanController::class, 'updateStatus'])->name('admin.pengaduan.update-status');
             // Approve temporary item (promote to master items)
             Route::post('/temporary-item/{id}/approve', [AdminPengaduanController::class, 'approveTemporaryItem'])->name('admin.pengaduan.approve-temporary');
+            // Reject temporary item (delete from system)
+            Route::post('/temporary-item/{id}/reject', [AdminPengaduanController::class, 'rejectTemporaryItem'])->name('admin.pengaduan.reject-temporary');
             Route::get('/export/excel', [AdminPengaduanController::class, 'exportExcel'])->name('admin.pengaduan.export-excel');
             Route::get('/export/pdf', [AdminPengaduanController::class, 'exportPdf'])->name('admin.pengaduan.export-pdf');
         });

@@ -124,56 +124,32 @@
             </div>
         </div>
 
-        <!-- Permintaan Barang -->
+        <!-- Info Permintaan Barang (Informasi Saja) -->
         @if($pengaduan->temporary_items && $pengaduan->temporary_items->count() > 0)
         <div class="bg-white rounded-lg md:rounded-xl shadow-md overflow-hidden">
             <div class="p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-600">
                 <h3 class="text-base md:text-lg font-bold text-white flex items-center">
-                    <i class="fas fa-box mr-2 text-sm md:text-base"></i>
-                    Permintaan Barang
+                    <i class="fas fa-info-circle mr-2 text-sm md:text-base"></i>
+                    Info Permintaan Barang Baru
                 </h3>
             </div>
             <div class="p-4 md:p-6">
-                <div class="space-y-3 md:space-y-4">
-                    @foreach($pengaduan->temporary_items as $item)
-                    <div class="bg-gray-50 p-3 md:p-4 rounded-lg border-2 
-                        @if($item->status_permintaan === 'Menunggu Persetujuan') border-yellow-200
-                        @elseif($item->status_permintaan === 'Disetujui') border-green-200
-                        @else border-red-200
-                        @endif">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center mb-2">
-                                    <i class="fas fa-box text-purple-500 mr-2 text-xs md:text-sm flex-shrink-0"></i>
-                                    <p class="font-bold text-sm md:text-base text-gray-900 break-words">{{ $item->nama_barang_baru }}</p>
-                                </div>
-                                <p class="text-xs md:text-sm text-gray-600 mb-1 break-words">
-                                    <i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>
-                                    {{ $item->lokasi_barang_baru }}
-                                </p>
-                                <p class="text-xs md:text-sm text-gray-600 mb-2 break-words">{{ Str::limit($item->alasan_permintaan, 100) }}</p>
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="px-2 py-1 md:px-3 md:py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        @if($item->status_permintaan === 'Menunggu Persetujuan') bg-yellow-100 text-yellow-800
-                                        @elseif($item->status_permintaan === 'Disetujui') bg-green-100 text-green-800
-                                        @else bg-red-100 text-red-800
-                                        @endif">
-                                        {{ $item->status_permintaan }}
-                                    </span>
-                                    <span class="text-xs text-gray-500">
-                                        {{ date('d/m/Y', strtotime($item->tanggal_permintaan)) }}
-                                    </span>
-                                </div>
-                                @if($item->catatan_admin)
-                                <div class="mt-2 p-2 bg-white rounded border border-gray-200">
-                                    <p class="text-xs font-semibold text-gray-700">Catatan Admin:</p>
-                                    <p class="text-xs text-gray-600 break-words">{{ $item->catatan_admin }}</p>
-                                </div>
-                                @endif
-                            </div>
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-box text-purple-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-purple-800">
+                                User meminta barang baru: 
+                                <strong>{{ $pengaduan->temporary_items->first()->nama_barang_baru }}</strong>
+                            </p>
+                            <p class="text-xs text-purple-600 mt-1">
+                                Status: {{ $pengaduan->temporary_items->first()->status_permintaan }} 
+                                (Dikelola oleh Admin)
+                            </p>
                         </div>
                     </div>
-                    @endforeach
                 </div>
             </div>
         </div>

@@ -13,9 +13,9 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
     <!-- Main Content -->
-    <div class="lg:col-span-2 space-y-6">
+    <div class="xl:col-span-3 space-y-6">
         <!-- Informasi Pengaduan -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
@@ -97,32 +97,130 @@
                          onclick="window.open(this.src, '_blank')">
                 </div>
                 @endif
-                @if($pengaduan->temporary_items && $pengaduan->temporary_items->count())
-                <div class="mt-4">
-                    <h4 class="text-sm font-semibold text-gray-600">Permintaan Barang Baru</h4>
-                    <div class="mt-2 space-y-3">
-                        @foreach($pengaduan->temporary_items as $tmp)
-                        <div class="p-3 border rounded-lg flex items-start justify-between">
-                            <div>
-                                <p class="font-semibold">{{ $tmp->nama_barang_baru }}</p>
-                                <p class="text-xs text-gray-500">Lokasi: {{ $tmp->lokasi_barang_baru }}</p>
-                                <p class="text-sm text-gray-700 mt-2">{{ Str::limit($tmp->alasan_permintaan, 200) }}</p>
+            </div>
+        </div>
+
+        <!-- Permintaan Barang Baru Section -->
+        @if($pengaduan->temporary_items && $pengaduan->temporary_items->count())
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border-l-4 border-purple-500">
+            <div class="p-6 bg-gradient-to-r from-purple-500 to-pink-500">
+                <h3 class="text-lg font-bold text-white flex items-center">
+                    <i class="fas fa-plus-circle mr-2"></i>
+                    Permintaan Barang Baru
+                    <span class="ml-3 bg-white text-purple-700 px-3 py-1 rounded-full text-sm font-bold">
+                        {{ $pengaduan->temporary_items->count() }} item
+                    </span>
+                </h3>
+                <p class="text-purple-100 text-sm mt-1">Pengguna mengajukan permintaan barang baru dalam pengaduan ini</p>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    @foreach($pengaduan->temporary_items as $index => $tmp)
+                    <div class="border-2 border-purple-100 rounded-xl overflow-hidden bg-gradient-to-br from-purple-25 to-pink-25 hover:shadow-md transition-shadow">
+                        <!-- Item Header -->
+                        <div class="p-4 bg-purple-50 border-b border-purple-100">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-box text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-gray-800">{{ $tmp->nama_barang_baru }}</h4>
+                                        <p class="text-sm text-gray-600 flex items-center mt-1">
+                                            <i class="fas fa-map-marker-alt text-purple-500 mr-1"></i>
+                                            {{ $tmp->lokasi_barang_baru }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-4 py-2 text-sm font-bold rounded-full bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-clock mr-1"></i>
+                                        Menunggu Persetujuan
+                                    </span>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Diajukan: {{ \Carbon\Carbon::parse($tmp->tanggal_permintaan)->format('d M Y') }}
+                                    </p>
+                                </div>
                             </div>
-                            <div class="ml-4 text-right">
-                                <form method="POST" action="{{ route('admin.pengaduan.approve-temporary', $tmp->id_item ?? $tmp->id) }}">
-                                    @csrf
-                                    <input type="hidden" name="catatan_admin" value="Disetujui dan ditambahkan ke master item">
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg">Approve</button>
-                                </form>
-                                <p class="text-xs text-gray-500 mt-2">Status: {{ $tmp->status_permintaan }}</p>
+                        </div>
+
+                        <!-- Item Details -->
+                        <div class="p-4">
+                            @if($tmp->alasan_permintaan)
+                            <div class="mb-4">
+                                <label class="text-xs font-semibold text-gray-600 uppercase mb-2 block">Alasan Permintaan:</label>
+                                <p class="text-gray-800 bg-gray-50 p-3 rounded-lg italic">"{{ $tmp->alasan_permintaan }}"</p>
+                            </div>
+                            @endif
+
+                            @if($tmp->deskripsi_barang_baru)
+                            <div class="mb-4">
+                                <label class="text-xs font-semibold text-gray-600 uppercase mb-2 block">Deskripsi Barang:</label>
+                                <p class="text-gray-800 bg-gray-50 p-3 rounded-lg">{{ $tmp->deskripsi_barang_baru }}</p>
+                            </div>
+                            @endif
+                                    <div class="space-y-3">
+                                        <!-- Input Catatan -->
+                                        <div>
+                                            <label for="catatan_admin_{{ $tmp->id_item }}" class="block text-xs font-semibold text-gray-700 mb-2">
+                                                Catatan Admin (Opsional)
+                                            </label>
+                                            <input type="text" id="catatan_admin_{{ $tmp->id_item }}" 
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                                   placeholder="Catatan untuk keputusan ini..." 
+                                                   value="">
+                                        </div>
+                                        
+                                        <!-- Buttons -->
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <!-- Approve Button -->
+                                            <form method="POST" action="{{ route('admin.pengaduan.approve-temporary', $tmp->id_item ?? $tmp->id) }}" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="catatan_admin" class="catatan-hidden">
+                                                <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-lg transition shadow-md flex items-center justify-center space-x-2" 
+                                                        onclick="this.querySelector('input[name=catatan_admin]').value = document.getElementById('catatan_admin_{{ $tmp->id_item }}').value || 'Barang baru ditambahkan ke inventaris'">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span class="text-sm">Setujui</span>
+                                                </button>
+                                            </form>
+                                            
+                                            <!-- Reject Button -->
+                                            <form method="POST" action="{{ route('admin.pengaduan.reject-temporary', $tmp->id_item ?? $tmp->id) }}" class="inline" 
+                                                  onsubmit="return confirm('Yakin ingin menolak permintaan barang baru ini? Data akan dihapus permanen.')">
+                                                @csrf
+                                                <input type="hidden" name="catatan_admin" class="catatan-hidden">
+                                                <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-lg transition shadow-md flex items-center justify-center space-x-2"
+                                                        onclick="this.querySelector('input[name=catatan_admin]').value = document.getElementById('catatan_admin_{{ $tmp->id_item }}').value || 'Permintaan barang baru ditolak'">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    <span class="text-sm">Tolak</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         @endforeach
-                    </div>
                 </div>
-                @endif
             </div>
         </div>
+        @else
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border-l-4 border-gray-300">
+            <div class="p-6 bg-gradient-to-r from-gray-100 to-gray-200">
+                <h3 class="text-lg font-bold text-gray-700 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Informasi Permintaan Barang
+                </h3>
+            </div>
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-box-open text-gray-400 text-2xl"></i>
+                </div>
+                <p class="text-gray-600 text-lg font-medium">Tidak Ada Permintaan Barang Baru</p>
+                <p class="text-gray-500 text-sm mt-2">Pengaduan ini hanya berkaitan dengan perbaikan/maintenance tanpa permintaan barang baru</p>
+            </div>
+        </div>
+        @endif
 
         <!-- Form Update Status - Admin hanya bisa action di Diajukan & Disetujui -->
         @if(in_array($pengaduan->status, ['Diajukan', 'Disetujui']))

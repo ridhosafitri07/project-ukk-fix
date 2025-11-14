@@ -24,11 +24,6 @@ class Pengaduan extends Model
         'tgl_verifikasi',
         'catatan_admin',
         'saran_petugas',
-        'ditangani_admin',
-        'nama_admin',
-        'ditolak_oleh',
-        'tgl_ditolak',
-        'diproses_oleh',
         'tgl_mulai_proses'
     ];
 
@@ -36,7 +31,6 @@ class Pengaduan extends Model
         'tgl_pengajuan',
         'tgl_selesai',
         'tgl_verifikasi',
-        'tgl_ditolak',
         'tgl_mulai_proses'
     ];
 

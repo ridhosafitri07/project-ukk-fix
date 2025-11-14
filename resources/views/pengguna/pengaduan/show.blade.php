@@ -156,6 +156,60 @@
                 @endif
             </div>
         </div>
+
+        <!-- Temporary Items Section -->
+        @if($pengaduan->temporary_items && $pengaduan->temporary_items->count() > 0)
+        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 animate-fade-in-up" style="animation-delay: 0.15s">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4">
+                <h4 class="text-xl font-bold text-white flex items-center space-x-2">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>Permintaan Barang Baru</span>
+                    <span class="ml-auto bg-white/20 px-3 py-1 rounded-full text-sm">{{ $pengaduan->temporary_items->count() }}</span>
+                </h4>
+            </div>
+            <div class="p-6 space-y-4">
+                @foreach($pengaduan->temporary_items as $temp)
+                <div class="border-2 border-purple-100 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-pink-50">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <h5 class="text-lg font-bold text-gray-900">{{ $temp->nama_barang_baru }}</h5>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>
+                                Lokasi: <strong>{{ $temp->lokasi_barang_baru }}</strong>
+                            </p>
+                        </div>
+                        <span class="px-4 py-2 text-xs font-bold rounded-full whitespace-nowrap ml-2 bg-yellow-100 text-yellow-800">
+                            Menunggu Persetujuan
+                        </span>
+                    </div>
+
+                    @if($temp->foto_kerusakan)
+                    <div class="mb-3">
+                        <p class="text-xs font-semibold text-gray-600 mb-2">Foto Kerusakan:</p>
+                        <div class="relative group inline-block">
+                            <img src="{{ asset('storage/' . $temp->foto_kerusakan) }}" 
+                                 alt="Foto Kerusakan" 
+                                 class="h-24 rounded-lg shadow-md border-2 border-gray-200 cursor-pointer hover:border-purple-400 transition">
+                            <a href="{{ asset('storage/' . $temp->foto_kerusakan) }}" target="_blank" 
+                               class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <i class="fas fa-expand text-white"></i>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 pt-2 border-t border-purple-200">
+                        <div>
+                            <span class="font-semibold">Tanggal Permintaan:</span><br>
+                            {{ \Carbon\Carbon::parse($temp->tanggal_permintaan)->format('d M Y H:i') }}
+                        </div>
+                    </div>
+
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
     
     <!-- Sidebar -->

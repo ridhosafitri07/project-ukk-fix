@@ -117,9 +117,7 @@
                 <td>{{ Str::limit($item->nama_pengaduan, 35) }}</td>
                 <td>{{ Str::limit($item->lokasi, 25) }}</td>
                 <td>
-                    @if($item->ditangani_admin && $item->nama_admin)
-                        <strong>Admin:</strong> {{ $item->nama_admin }}
-                    @elseif($item->petugas)
+                    @if($item->petugas)
                         <strong>Petugas:</strong> {{ $item->petugas->nama }}
                         @if($item->petugas->pekerjaan)
                             <br><small>({{ $item->petugas->pekerjaan }})</small>

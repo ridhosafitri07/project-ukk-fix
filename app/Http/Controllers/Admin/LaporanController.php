@@ -15,7 +15,7 @@ class LaporanController extends Controller
         
         if ($type == 'pengaduan') {
             $query = Pengaduan::with(['user', 'petugas'])
-                ->whereIn('status', ['Proses', 'Selesai']);
+                ->whereIn('status', ['Disetujui', 'Ditolak', 'Diproses', 'Selesai']);
             
             // Filter by date range
             if ($request->filled('tanggal_dari')) {
@@ -32,15 +32,21 @@ class LaporanController extends Controller
             
             $data = $query->orderBy('tgl_pengajuan', 'desc')->paginate(15);
             
-            // Statistics
+            // Statistics (pure transit concept - no status tracking in temporary table)
             $stats = [
-                'total_pengaduan' => Pengaduan::whereIn('status', ['Proses', 'Selesai'])->count(),
-                'total_permintaan' => TemporaryItem::whereIn('status_permintaan', ['Disetujui', 'Ditolak'])->count(),
-                'disetujui' => Pengaduan::where('status', 'Selesai')->count(),
-                'ditolak' => 0, // Pengaduan tidak ada status ditolak
+                'total_pengaduan' => Pengaduan::whereIn('status', ['Disetujui', 'Ditolak', 'Diproses', 'Selesai'])->count(),
+                'total_permintaan' => 0, // No historical tracking in pure transit concept
+                'disetujui' => Pengaduan::whereIn('status', ['Disetujui', 'Selesai'])->count(),
+                'ditolak' => Pengaduan::where('status', 'Ditolak')->count(),
             ];
             
         } else {
+            // Temporary item reporting disabled - pure transit concept implementation
+            // Redirect to pengaduan reports since items are tracked through pengaduan workflow
+            return redirect()->route('admin.laporan.index', ['type' => 'pengaduan'])
+                ->with('info', 'Laporan permintaan barang dialihkan ke laporan pengaduan karena sistem pure transit.');
+            
+            /* ORIGINAL CODE - DISABLED
             $query = TemporaryItem::with(['pengaduan.user', 'pengaduan.petugas'])
                 ->whereIn('status_permintaan', ['Disetujui', 'Ditolak']);
             
@@ -61,11 +67,12 @@ class LaporanController extends Controller
             
             // Statistics
             $stats = [
-                'total_pengaduan' => Pengaduan::whereIn('status', ['Proses', 'Selesai'])->count(),
+                'total_pengaduan' => Pengaduan::whereIn('status', ['Disetujui', 'Ditolak', 'Diproses', 'Selesai'])->count(),
                 'total_permintaan' => TemporaryItem::whereIn('status_permintaan', ['Disetujui', 'Ditolak'])->count(),
                 'disetujui' => TemporaryItem::where('status_permintaan', 'Disetujui')->count(),
                 'ditolak' => TemporaryItem::where('status_permintaan', 'Ditolak')->count(),
             ];
+            */
         }
         
         return view('admin.laporan.index', compact('data', 'type', 'stats'));
@@ -77,7 +84,7 @@ class LaporanController extends Controller
         
         if ($type == 'pengaduan') {
             $query = Pengaduan::with(['user', 'petugas'])
-                ->whereIn('status', ['Proses', 'Selesai']);
+                ->whereIn('status', ['Disetujui', 'Ditolak', 'Diproses', 'Selesai']);
             
             // Apply filters
             if ($request->filled('tanggal_dari')) {
@@ -125,6 +132,12 @@ class LaporanController extends Controller
             };
             
         } else {
+            // Temporary item export disabled - pure transit concept
+            // Redirect to pengaduan export since items are tracked through pengaduan workflow
+            return redirect()->route('admin.laporan.export', ['type' => 'pengaduan'] + $request->all())
+                ->with('info', 'Export permintaan barang dialihkan ke export pengaduan.');
+            
+            /* ORIGINAL CODE - DISABLED
             $query = TemporaryItem::with(['pengaduan.user', 'pengaduan.petugas'])
                 ->whereIn('status_permintaan', ['Disetujui', 'Ditolak']);
             
@@ -174,6 +187,7 @@ class LaporanController extends Controller
                 
                 fclose($file);
             };
+            */
         }
         
         return response()->stream($callback, 200, $headers);

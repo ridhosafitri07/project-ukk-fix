@@ -81,6 +81,16 @@
                         </div>
                     </div>
                     
+                    <!-- Temporary Items Badge -->
+                    @if($pengaduan->temporary_items && $pengaduan->temporary_items->count() > 0)
+                    <div class="mt-3 mb-3">
+                        <div class="inline-flex items-center space-x-2 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>{{ $pengaduan->temporary_items->count() }} Barang Baru (Menunggu Persetujuan)</span>
+                        </div>
+                    </div>
+                    @endif
+                    
                     <!-- Progress Bar -->
                     <div class="mt-4">
                         @php

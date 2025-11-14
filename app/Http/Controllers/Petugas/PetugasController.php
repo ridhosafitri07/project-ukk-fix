@@ -178,13 +178,7 @@ class PetugasController extends Controller
                 // PENTING: Kolom petugas baru diisi saat klik "Mulai Proses"
                 $pengaduan->id_petugas = $petugasId;
                 
-                // Reset flag admin karena sekarang petugas yang menangani
-                $pengaduan->ditangani_admin = false;
-                $pengaduan->nama_admin = null;
-                
                 $petugasNama = Auth::user()->nama_pengguna;
-                $pengaduan->diproses_oleh = $petugasNama;
-                
                 $message = "Proses perbaikan telah dimulai oleh {$petugasNama}. Pengaduan sekarang ditangani oleh Anda.";
             }
             
@@ -255,13 +249,10 @@ class PetugasController extends Controller
             // Create item request
             TemporaryItem::create([
                 'id_pengaduan' => $pengaduan->id_pengaduan,
-                'id_petugas' => $petugasId,
                 'nama_barang_baru' => $request->nama_barang_baru,
                 'lokasi_barang_baru' => $request->lokasi_barang_baru,
                 'alasan_permintaan' => $request->alasan_permintaan,
-                'foto_kerusakan' => $fotoPath,
-                'status_permintaan' => 'Menunggu Persetujuan',
-                'tanggal_permintaan' => now()
+                'deskripsi_barang_baru' => $request->alasan_permintaan
             ]);
             
             DB::commit();

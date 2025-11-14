@@ -78,16 +78,16 @@
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-list-alt text-blue-500 mr-2"></i>
-                    Permintaan Terbaru dari Petugas
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    Informasi Permintaan Barang
                 </h3>
-                <p class="text-sm text-gray-600 mt-1">5 permintaan terbaru yang masuk</p>
+                <p class="text-sm text-gray-600 mt-1">Managemen permintaan melalui sistem pengaduan</p>
             </div>
-            <a href="{{ route('admin.sarpras.permintaan-list') }}" 
-               class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center shadow-md transform hover:scale-105 transition-all">
-                <i class="fas fa-th-list mr-2"></i>
-                Lihat Semua
-            </a>
+            <a href="{{ route('admin.pengaduan.index') }}" 
+               class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center shadow-md transform hover:scale-105 transition-all">
+                <i class="fas fa-clipboard-list mr-2"></i>
+                Lihat Pengaduan
+            </a>"
         </div>
     </div>
     

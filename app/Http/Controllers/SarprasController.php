@@ -10,15 +10,39 @@ class SarprasController extends Controller
 {
     public function index()
     {
+        $totalPendingItems = TemporaryItem::count();
+        $pendingPengaduan = Pengaduan::where('status', 'Pending')->count();
+        
         $data = [
-            'total_permintaan' => TemporaryItem::count(),
-            'menunggu_persetujuan' => TemporaryItem::where('status_permintaan', 'Menunggu Persetujuan')->count(),
-            'disetujui' => TemporaryItem::where('status_permintaan', 'Disetujui')->count(),
-            'ditolak' => TemporaryItem::where('status_permintaan', 'Ditolak')->count(),
-            'permintaan_terbaru' => TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
+            'total_permintaan' => $totalPendingItems,
+            'menunggu_persetujuan' => $totalPendingItems, // All items are pending
+            'disetujui' => 0, // Approved items moved to master table
+            'ditolak' => 0, // Rejected items deleted
+            'permintaan_terbaru' => TemporaryItem::with(['pengaduan'])
                 ->orderBy('tanggal_permintaan', 'desc')
                 ->take(5)
-                ->get()
+                ->get(),
+            // Notification data for sarpras context
+            'notifications' => [
+                [
+                    'type' => 'sarpras',
+                    'icon' => 'fas fa-box',
+                    'color' => 'blue',
+                    'title' => 'Permintaan Barang',
+                    'message' => $totalPendingItems > 0 ? "Ada {$totalPendingItems} permintaan barang menunggu approval" : 'Tidak ada permintaan barang baru',
+                    'time' => 'Baru saja',
+                    'count' => $totalPendingItems
+                ],
+                [
+                    'type' => 'pengaduan', 
+                    'icon' => 'fas fa-clipboard-list',
+                    'color' => 'green',
+                    'title' => 'Pengaduan Pending',
+                    'message' => $pendingPengaduan > 0 ? "Ada {$pendingPengaduan} pengaduan menunggu review" : 'Semua pengaduan telah diproses',
+                    'time' => '5 menit lalu',
+                    'count' => $pendingPengaduan
+                ]
+            ]
         ];
 
         return view('admin.sarpras.index', $data);
@@ -26,22 +50,34 @@ class SarprasController extends Controller
 
     public function permintaanList()
     {
-        $permintaan = TemporaryItem::with(['pengaduan', 'pengaduan.petugas'])
-            ->orderBy('tanggal_permintaan', 'desc')
-            ->paginate(10);
-
-        return view('admin.sarpras.permintaan-list', compact('permintaan'));
+        // Redirect to pengaduan system - pure transit concept implementation
+        return redirect()->route('admin.pengaduan.index')
+            ->with('info', 'Managemen permintaan barang baru sekarang dikelola melalui sistem pengaduan.');
     }
 
     public function showPermintaan($id)
     {
-        $permintaan = TemporaryItem::with(['pengaduan', 'pengaduan.petugas', 'pengaduan.user'])
-            ->findOrFail($id);
-        return view('admin.sarpras.show-permintaan', compact('permintaan'));
+        // Try to find the related pengaduan for this temporary item
+        $tempItem = TemporaryItem::find($id);
+        
+        if ($tempItem && $tempItem->id_pengaduan) {
+            return redirect()->route('admin.pengaduan.show', $tempItem->id_pengaduan)
+                ->with('info', 'Permintaan barang baru dikelola melalui detail pengaduan.');
+        }
+        
+        // If no related pengaduan found, redirect to pengaduan list
+        return redirect()->route('admin.pengaduan.index')
+            ->with('warning', 'Data permintaan tidak ditemukan. Silakan kelola melalui sistem pengaduan.');
     }
 
     public function updateStatus(Request $request, $id)
     {
+        // DISABLED: This method uses deleted columns (status_permintaan, catatan_admin, tanggal_persetujuan)
+        // Use AdminPengaduanController::approveTemporaryItem and rejectTemporaryItem instead
+        
+        return redirect()->back()->with('error', 'Please use the pengaduan approval system to manage item requests.');
+        
+        /* ORIGINAL CODE - DISABLED DUE TO COLUMN REMOVAL
         $request->validate([
             'status' => 'required|in:Disetujui,Ditolak',
             'catatan_admin' => 'required|string|max:255'
@@ -65,5 +101,6 @@ class SarprasController extends Controller
         return redirect()
             ->route('admin.sarpras.show-permintaan', ['id' => $id])
             ->with('success', 'Status permintaan berhasil diperbarui');
+        */
     }
 }

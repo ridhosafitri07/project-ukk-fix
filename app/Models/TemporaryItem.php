@@ -14,22 +14,15 @@ class TemporaryItem extends Model
 
     protected $fillable = [
         'id_pengaduan',
-        'id_petugas',
         'nama_barang_baru',
         'lokasi_barang_baru',
         'alasan_permintaan',
-        'foto_kerusakan',
-        'status_permintaan',
-        'tanggal_permintaan',
-        'tanggal_persetujuan',
-        'catatan_admin',
-        'catatan_petugas',
+        'deskripsi_barang_baru'
     ];
 
-    // TAMBAHKAN INI:
+    // Cast tanggal_permintaan to datetime if it exists
     protected $casts = [
-        'tanggal_permintaan' => 'datetime',
-        'tanggal_persetujuan' => 'datetime',
+        'tanggal_permintaan' => 'datetime'
     ];
 
     public function pengaduan()

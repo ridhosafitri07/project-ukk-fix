@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalItems = Item::count();
         $totalPengaduan = Pengaduan::count();
-        $pendingItems = TemporaryItem::where('status_permintaan', 'Menunggu Persetujuan')->count();
+        $pendingItems = TemporaryItem::count(); // All temporary items are pending in pure transit concept
 
         // Get monthly pengaduan statistics
         $pengaduanStats = Pengaduan::select(
@@ -32,12 +32,11 @@ class DashboardController extends Controller
         ->pluck('total', 'month')
         ->toArray();
 
-        // Get item status statistics
-        $itemStats = TemporaryItem::select('status_permintaan', DB::raw('COUNT(*) as total'))
-            ->groupBy('status_permintaan')
-            ->get()
-            ->pluck('total', 'status_permintaan')
-            ->toArray();
+        // Get item status statistics (pure transit concept)
+        $totalPendingItems = TemporaryItem::count();
+        $itemStats = [
+            'Menunggu Persetujuan' => $totalPendingItems
+        ];
 
         // Get recent activities
         $recentActivities = collect();
@@ -56,21 +55,34 @@ class DashboardController extends Controller
             });
         $recentActivities = $recentActivities->concat($recentPengaduan);
 
-        // Get recent item approvals
-        $recentApprovals = TemporaryItem::where('status_permintaan', 'Disetujui')
-            ->orderBy('tanggal_persetujuan', 'desc')
-            ->take(5)
-            ->get()
-            ->map(function ($item) {
-                return (object)[
-                    'type' => 'approval',
-                    'description' => "Item {$item->nama_barang_baru} telah disetujui",
-                    'created_at' => $item->tanggal_persetujuan
-                ];
-            });
-        $recentActivities = $recentActivities->concat($recentApprovals)
-            ->sortByDesc('created_at')
-            ->take(5);
+        // Recent item approvals disabled - using pure transit concept
+        // Items are approved through pengaduan workflow, not tracked in temporary table
+        
+        // Sort and limit recent activities
+        $recentActivities = $recentActivities->sortByDesc('created_at')->take(5);
+
+        // Notifications for dashboard context
+        $pendingPengaduan = Pengaduan::where('status', 'Pending')->count();
+        $notifications = [
+            [
+                'type' => 'dashboard',
+                'icon' => 'fas fa-tachometer-alt',
+                'color' => 'purple',
+                'title' => 'Dashboard Update',
+                'message' => 'Sistem berjalan normal, semua metrik terupdate',
+                'time' => 'Baru saja',
+                'count' => 0
+            ],
+            [
+                'type' => 'pengaduan', 
+                'icon' => 'fas fa-clipboard-list',
+                'color' => 'blue',
+                'title' => 'Pengaduan Pending',
+                'message' => $pendingPengaduan > 0 ? "Ada {$pendingPengaduan} pengaduan menunggu review" : 'Semua pengaduan telah diproses',
+                'time' => '2 menit lalu',
+                'count' => $pendingPengaduan
+            ]
+        ];
 
         return view('admin.dashboard', compact(
             'totalUsers',
@@ -79,7 +91,8 @@ class DashboardController extends Controller
             'pendingItems',
             'pengaduanStats',
             'itemStats',
-            'recentActivities'
+            'recentActivities',
+            'notifications'
         ));
     }
 }

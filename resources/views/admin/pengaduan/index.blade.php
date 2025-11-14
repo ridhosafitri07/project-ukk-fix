@@ -229,57 +229,7 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @if($item->status === 'Ditolak' && $item->ditolak_oleh)
-                        {{-- Ditolak oleh --}}
-                        <div class="flex flex-col">
-                            <span class="text-sm font-medium text-gray-900 flex items-center">
-                                <i class="fas fa-user-times text-red-500 mr-1 text-xs"></i>
-                                {{ Str::limit($item->ditolak_oleh, 20) }}
-                            </span>
-                            @if($item->petugas && $item->petugas->pekerjaan)
-                            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
-                                <i class="fas fa-briefcase mr-1"></i>
-                                {{ $item->petugas->pekerjaan }}
-                            </span>
-                            @else
-                            <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
-                                <i class="fas fa-times-circle mr-1"></i>
-                                Ditolak
-                            </span>
-                            @endif
-                        </div>
-                        @elseif($item->status === 'Diproses' && $item->diproses_oleh)
-                        {{-- Diproses oleh --}}
-                        <div class="flex flex-col">
-                            <span class="text-sm font-medium text-gray-900 flex items-center">
-                                <i class="fas fa-user-cog text-blue-500 mr-1 text-xs"></i>
-                                {{ Str::limit($item->diproses_oleh, 20) }}
-                            </span>
-                            @if($item->petugas && $item->petugas->pekerjaan)
-                            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
-                                <i class="fas fa-briefcase mr-1"></i>
-                                {{ $item->petugas->pekerjaan }}
-                            </span>
-                            @else
-                            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
-                                <i class="fas fa-cog mr-1"></i>
-                                Sedang Proses
-                            </span>
-                            @endif
-                        </div>
-                        @elseif($item->ditangani_admin)
-                        {{-- Ditangani oleh Admin --}}
-                        <div class="flex flex-col">
-                            <span class="text-sm font-medium text-gray-900 flex items-center">
-                                <i class="fas fa-user-shield text-purple-500 mr-1 text-xs"></i>
-                                {{ Str::limit($item->nama_admin, 20) }}
-                            </span>
-                            <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
-                                <i class="fas fa-crown mr-1"></i>
-                                Admin
-                            </span>
-                        </div>
-                        @elseif($item->petugas)
+                        @if($item->petugas)
                         {{-- Ditangani oleh Petugas --}}
                         <div class="flex flex-col">
                             <span class="text-sm font-medium text-gray-900 flex items-center">
@@ -294,8 +244,17 @@
                             @endif
                         </div>
                         @else
-                        {{-- Belum ditugaskan --}}
-                        <span class="text-xs text-gray-400 italic">Belum ditugaskan</span>
+                        {{-- Belum Ditugaskan --}}
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium text-gray-500 flex items-center">
+                                <i class="fas fa-user-clock text-gray-400 mr-1 text-xs"></i>
+                                Belum Ditugaskan
+                            </span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full mt-1 inline-flex items-center w-fit">
+                                <i class="fas fa-hourglass-half mr-1"></i>
+                                Menunggu
+                            </span>
+                        </div>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -426,13 +385,6 @@
                         @foreach($petugas as $p)
                         <option value="petugas_{{ $p->id_petugas }}" {{ request('petugas') == 'petugas_'.$p->id_petugas ? 'selected' : '' }}>
                             {{ $p->nama }} @if($p->pekerjaan) ({{ $p->pekerjaan }}) @endif
-                        </option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="Admin">
-                        @foreach($admins as $admin)
-                        <option value="admin_{{ $admin }}" {{ request('petugas') == 'admin_'.$admin ? 'selected' : '' }}>
-                            {{ $admin }} (Admin)
                         </option>
                         @endforeach
                     </optgroup>

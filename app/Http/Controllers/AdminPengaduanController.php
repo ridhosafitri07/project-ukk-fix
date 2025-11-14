@@ -33,21 +33,17 @@ class AdminPengaduanController extends Controller
             $query->where('lokasi', 'LIKE', '%' . $request->lokasi . '%');
         }
 
-        // Filter by petugas/admin
+        // Filter by petugas  
         if ($request->filled('petugas')) {
             $petugasFilter = $request->petugas;
             
             if ($petugasFilter === 'belum_ditugaskan') {
-                // Belum ditugaskan: tidak ada petugas dan tidak ditangani admin
-                $query->whereNull('id_petugas')->where('ditangani_admin', false);
+                // Belum ditugaskan: tidak ada petugas  
+                $query->whereNull('id_petugas');
             } elseif (str_starts_with($petugasFilter, 'petugas_')) {
                 // Filter by petugas
                 $idPetugas = str_replace('petugas_', '', $petugasFilter);
                 $query->where('id_petugas', $idPetugas);
-            } elseif (str_starts_with($petugasFilter, 'admin_')) {
-                // Filter by admin
-                $namaAdmin = str_replace('admin_', '', $petugasFilter);
-                $query->where('nama_admin', $namaAdmin);
             }
         }
 
@@ -64,9 +60,8 @@ class AdminPengaduanController extends Controller
         // Data untuk filter dropdown
         $lokasis = Pengaduan::distinct()->pluck('lokasi')->filter()->sort()->values();
         $petugas = Petugas::orderBy('nama')->get();
-        $admins = Pengaduan::whereNotNull('nama_admin')->distinct()->pluck('nama_admin')->filter()->sort()->values();
 
-        return view('admin.pengaduan.index', compact('pengaduan', 'statistics', 'lokasis', 'petugas', 'admins'));
+        return view('admin.pengaduan.index', compact('pengaduan', 'statistics', 'lokasis', 'petugas'));
     }
 
     public function show(Pengaduan $pengaduan)
@@ -96,7 +91,7 @@ class AdminPengaduanController extends Controller
             $newItem = \App\Models\Item::create([
                 'nama_item' => $temp->nama_barang_baru,
                 'lokasi' => $temp->lokasi_barang_baru,
-                'deskripsi' => $temp->alasan_permintaan,
+                'deskripsi' => $temp->nama_barang_baru . ' - Item baru berdasarkan permintaan pengaduan',
                 'foto' => $temp->foto_kerusakan
             ]);
 
@@ -104,20 +99,45 @@ class AdminPengaduanController extends Controller
             $pengaduan = Pengaduan::find($temp->id_pengaduan);
             if ($pengaduan) {
                 $pengaduan->id_item = $newItem->id_item;
+                $pengaduan->catatan_admin = $request->input('catatan_admin', 'Permintaan barang baru disetujui dan ditambahkan ke master items');
                 $pengaduan->save();
             }
 
-            // Update temporary item status
-            $temp->status_permintaan = 'Disetujui';
-            $temp->tanggal_persetujuan = now();
-            $temp->catatan_admin = $request->input('catatan_admin', 'Disetujui dan dipromosikan ke master items');
-            $temp->save();
+            // Delete temporary item since it's now in master items
+            $temp->delete();
 
             DB::commit();
             return back()->with('success', 'Temporary item disetujui dan ditambahkan ke master barang.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menyetujui temporary item: ' . $e->getMessage());
+        }
+    }
+
+    public function rejectTemporaryItem(Request $request, $id)
+    {
+        $temp = TemporaryItem::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            // Save rejection reason to pengaduan
+            $pengaduan = Pengaduan::find($temp->id_pengaduan);
+            if ($pengaduan) {
+                $alasanPenolakan = $request->input('catatan_admin', 'Permintaan barang baru ditolak oleh admin');
+                $pengaduan->catatan_admin = $pengaduan->catatan_admin 
+                    ? $pengaduan->catatan_admin . "\n\nPenolakan Barang Baru: " . $alasanPenolakan
+                    : "Penolakan Barang Baru: " . $alasanPenolakan;
+                $pengaduan->save();
+            }
+
+            // Delete temporary item completely (it's just transit data)
+            $temp->delete();
+
+            DB::commit();
+            return back()->with('success', 'Permintaan barang baru ditolak dan dihapus dari sistem.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menolak temporary item: ' . $e->getMessage());
         }
     }
 
@@ -183,13 +203,11 @@ class AdminPengaduanController extends Controller
                     $message = 'Pengaduan berhasil disetujui. Semua petugas dapat melihat dan memulai proses perbaikan.';
                 }
                 
-                // Update temporary items jika ada
+                // Update temporary items jika ada (pure transit concept)
                 if ($pengaduan->temporary_items->count() > 0) {
                     foreach ($pengaduan->temporary_items as $item) {
-                        $item->status_permintaan = 'Disetujui';
-                        $item->tanggal_persetujuan = now();
-                        $item->catatan_admin = $request->catatan_admin;
-                        $item->save();
+                        // Items remain in temporary table until explicitly approved/rejected
+                        // No status tracking needed in pure transit concept
                     }
                 }
             }
@@ -199,20 +217,14 @@ class AdminPengaduanController extends Controller
                 $pengaduan->status = 'Ditolak';
                 $pengaduan->tgl_verifikasi = now();
                 
-                // Track siapa yang menolak
                 $adminUser = auth()->user();
-                $pengaduan->ditolak_oleh = $adminUser->nama_pengguna;
-                $pengaduan->tgl_ditolak = now();
-                
                 $message = 'Pengaduan telah ditolak oleh Admin ' . $adminUser->nama_pengguna . '.';
                 
-                // Update temporary items jika ada
+                // Update temporary items jika ada (pure transit concept)
                 if ($pengaduan->temporary_items->count() > 0) {
                     foreach ($pengaduan->temporary_items as $item) {
-                        $item->status_permintaan = 'Ditolak';
-                        $item->tanggal_persetujuan = now();
-                        $item->catatan_admin = $request->catatan_admin;
-                        $item->save();
+                        // Items remain in temporary table until explicitly approved/rejected
+                        // No status tracking needed in pure transit concept
                     }
                 }
             }
@@ -323,9 +335,7 @@ class AdminPengaduanController extends Controller
             $no = 1;
             foreach ($pengaduan as $item) {
                 $handler = 'Belum ditugaskan';
-                if ($item->ditangani_admin && $item->nama_admin) {
-                    $handler = 'Admin: ' . $item->nama_admin;
-                } elseif ($item->petugas) {
+                if ($item->petugas) {
                     $handler = 'Petugas: ' . $item->petugas->nama;
                     if ($item->petugas->pekerjaan) {
                         $handler .= ' (' . $item->petugas->pekerjaan . ')';

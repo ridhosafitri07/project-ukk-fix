@@ -37,7 +37,7 @@
     <div class="lg:col-span-2 space-y-4 md:space-y-6">
         <!-- Informasi Pengaduan -->
         <div class="bg-white rounded-lg md:rounded-xl shadow-md overflow-hidden">
-            <div class="p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-600">
+            <div class="p-4 md:p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-base md:text-lg font-bold text-white flex items-center">
                     <i class="fas fa-info-circle mr-2 text-sm md:text-base"></i>
                     Informasi Pengaduan
@@ -84,7 +84,7 @@
 
         <!-- Detail Pengaduan -->
         <div class="bg-white rounded-lg md:rounded-xl shadow-md overflow-hidden">
-            <div class="p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-600">
+            <div class="p-4 md:p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-base md:text-lg font-bold text-white flex items-center">
                     <i class="fas fa-file-alt mr-2 text-sm md:text-base"></i>
                     Detail Pengaduan
@@ -127,24 +127,24 @@
         <!-- Info Permintaan Barang (Informasi Saja) -->
         @if($pengaduan->temporary_items && $pengaduan->temporary_items->count() > 0)
         <div class="bg-white rounded-lg md:rounded-xl shadow-md overflow-hidden">
-            <div class="p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-600">
+            <div class="p-4 md:p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-base md:text-lg font-bold text-white flex items-center">
                     <i class="fas fa-info-circle mr-2 text-sm md:text-base"></i>
                     Info Permintaan Barang Baru
                 </h3>
             </div>
             <div class="p-4 md:p-6">
-                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <i class="fas fa-box text-purple-400"></i>
+                            <i class="fas fa-box text-blue-400"></i>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-purple-800">
+                            <p class="text-sm font-medium text-blue-800">
                                 User meminta barang baru: 
                                 <strong>{{ $pengaduan->temporary_items->first()->nama_barang_baru }}</strong>
                             </p>
-                            <p class="text-xs text-purple-600 mt-1">
+                            <p class="text-xs text-blue-600 mt-1">
                                 Status: {{ $pengaduan->temporary_items->first()->status_permintaan }} 
                                 (Dikelola oleh Admin)
                             </p>
@@ -158,7 +158,7 @@
         <!-- Form Update Status - PROGRESSIVE UI -->
         @if(in_array($pengaduan->status, ['Diajukan', 'Disetujui', 'Diproses']))
         <div class="bg-white rounded-lg md:rounded-xl shadow-md overflow-hidden">
-            <div class="p-4 md:p-6 bg-gradient-to-r from-purple-500 to-pink-600">
+            <div class="p-4 md:p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-base md:text-lg font-bold text-white flex items-center">
                     <i class="fas fa-tasks mr-2 text-sm md:text-base"></i>
                     Update Status Pekerjaan

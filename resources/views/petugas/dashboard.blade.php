@@ -8,16 +8,16 @@
 <!-- Stats Cards -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
     <!-- Total Tugas Card -->
-    <div class="bg-white rounded-xl shadow-sm hover:shadow-md p-4 md:p-6 border-l-4 border-green-500 transition-all">
+    <div class="bg-white rounded-xl shadow-sm hover:shadow-md p-4 md:p-6 border-l-4 border-blue-500 transition-all">
         <div class="flex flex-col">
             <div class="flex items-center justify-between mb-2">
                 <p class="text-xs md:text-sm font-medium text-gray-500 uppercase">Total Tugas</p>
-                <div class="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-clipboard-list text-lg md:text-2xl text-green-500"></i>
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clipboard-list text-lg md:text-2xl text-blue-500"></i>
                 </div>
             </div>
             <p class="text-2xl md:text-3xl font-bold text-gray-800">{{ $totalTugas ?? 0 }}</p>
-            <p class="text-xs text-green-600 mt-1">
+            <p class="text-xs text-blue-600 mt-1">
                 <i class="fas fa-tasks mr-1"></i>
                 Semua pengaduan
             </p>
@@ -89,8 +89,8 @@
                     </h3>
                     <p class="text-xs md:text-sm text-gray-500 mt-1">Pengaduan yang perlu ditangani</p>
                 </div>
-                <a href="{{ route('petugas.pengaduan.index') }}" 
-                   class="px-3 py-2 md:px-4 md:py-2 bg-green-500 text-white text-xs md:text-sm rounded-lg hover:bg-green-600 flex items-center transition-colors">
+                <a href=\"{{ route('petugas.pengaduan.index') }}\" 
+                   class=\"px-3 py-2 md:px-4 md:py-2 bg-blue-500 text-white text-xs md:text-sm rounded-lg hover:bg-blue-600 flex items-center transition-colors\">
                     <i class="fas fa-list mr-1 md:mr-2"></i>
                     <span class="hidden sm:inline">Lihat Semua</span>
                     <span class="sm:hidden">Semua</span>
@@ -162,12 +162,12 @@
                 <div class="space-y-3 md:space-y-4">
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 md:w-10 md:h-10 bg-green-100 rounded-lg flex items-center justify-center mr-2 md:mr-3">
-                                <i class="fas fa-check text-green-600 text-sm md:text-base"></i>
+                            <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                                <i class="fas fa-check text-blue-600 text-sm md:text-base"></i>
                             </div>
                             <span class="text-xs md:text-sm font-medium text-gray-700">Selesai</span>
                         </div>
-                        <span class="text-base md:text-lg font-bold text-green-600">{{ $tugasSelesai ?? 0 }}</span>
+                        <span class="text-base md:text-lg font-bold text-blue-600">{{ $tugasSelesai ?? 0 }}</span>
                     </div>
                     
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -195,10 +195,10 @@
                 <div class="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs md:text-sm font-medium text-gray-700">Completion Rate</span>
-                        <span class="text-xs md:text-sm font-bold text-green-600">{{ $completionRate ?? 0 }}%</span>
+                        <span class="text-xs md:text-sm font-bold text-blue-600">{{ $completionRate ?? 0 }}%</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2 md:h-3">
-                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 md:h-3 rounded-full transition-all" 
+                        <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 md:h-3 rounded-full transition-all" 
                              style="width: {{ $completionRate ?? 0 }}%"></div>
                     </div>
                 </div>

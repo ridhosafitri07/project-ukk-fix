@@ -6,11 +6,11 @@
 
 @section('content')
 <div class="bg-white rounded-xl shadow-md overflow-hidden">
-    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-history text-purple-500 mr-2"></i>
+                    <i class="fas fa-history text-blue-500 mr-2"></i>
                     Riwayat Pekerjaan
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">Daftar pengaduan yang sudah diselesaikan</p>
@@ -21,7 +21,7 @@
                     Filter
                 </button>
                 <a href="{{ route('petugas.riwayat.export') }}{{ request()->getQueryString() ? ('?' . request()->getQueryString()) : '' }}" 
-                   class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center shadow-md inline-flex items-center">
+                   class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center shadow-md inline-flex items-center">
                     <i class="fas fa-file-export mr-2"></i>
                     Export
                 </a>
@@ -49,7 +49,7 @@
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Judul atau nama pengadu" class="mt-1 block w-full border-gray-200 rounded-md">
             </div>
             <div class="md:col-span-4 flex items-center space-x-2 mt-2">
-                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Terapkan</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Terapkan</button>
                 <a href="{{ route('petugas.riwayat.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg">Reset</a>
             </div>
         </form>
@@ -96,8 +96,8 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                                <span class="text-purple-600 font-bold text-xs">{{ strtoupper(substr($item->user->nama_pengguna, 0, 2)) }}</span>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-xs">{{ strtoupper(substr($item->user->nama_pengguna, 0, 2)) }}</span>
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900">{{ $item->user->nama_pengguna }}</p>
@@ -121,7 +121,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <a href="{{ route('petugas.riwayat.show', $item) }}" 
-                           class="text-purple-600 hover:text-purple-900 inline-flex items-center">
+                           class="text-blue-600 hover:text-blue-900 inline-flex items-center">
                             <i class="fas fa-eye mr-1"></i>
                             Detail
                         </a>

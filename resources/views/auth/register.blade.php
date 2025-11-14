@@ -4,34 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - SAPRAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        :root {
+            --primary-blue: #2563eb;
+            --primary-blue-light: #3b82f6;
+            --accent-purple: #8b5cf6;
         }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+        }
+
         .gradient-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .gradient-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
         }
+
         .input-field {
             background: #f8f9fa;
             border: 2px solid #e0e0e0;
             transition: all 0.3s ease;
         }
+
         .input-field:focus {
             background: #fff;
-            border-color: #667eea;
+            border-color: var(--primary-blue);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
+
         .feature-list {
             animation: slideInLeft 0.6s ease;
         }
+
         @keyframes slideInLeft {
             from {
                 opacity: 0;
@@ -42,6 +58,7 @@
                 transform: translateX(0);
             }
         }
+
         @keyframes slideInRight {
             from {
                 opacity: 0;
@@ -52,20 +69,23 @@
                 transform: translateX(0);
             }
         }
+
         .form-container {
             animation: slideInRight 0.6s ease;
         }
+
         .icon-circle {
             width: 60px;
             height: 60px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 28px;
         }
+
         .password-strength {
             height: 6px;
             background: #e0e0e0;
@@ -73,6 +93,7 @@
             margin-top: 6px;
             overflow: hidden;
         }
+
         .password-strength-bar {
             height: 100%;
             width: 0%;
@@ -80,6 +101,7 @@
             transition: all 0.3s ease;
             border-radius: 3px;
         }
+
         .strength-weak { background: #ef4444; width: 33%; }
         .strength-medium { background: #eab308; width: 66%; }
         .strength-strong { background: #22c55e; width: 100%; }
@@ -88,7 +110,7 @@
 <body class="bg-gray-50">
     <div class="min-h-screen flex">
         <!-- Left Section - Features -->
-        <div class="hidden lg:flex lg:w-1/2 gradient-bg text-white items-center justify-center p-12">
+        <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-purple-700 text-white items-center justify-center p-12">
             <div class="feature-list max-w-md">
                 <div class="mb-12">
                     <div class="flex items-center space-x-3 mb-4">
@@ -97,7 +119,7 @@
                         </div>
                         <span class="text-3xl font-bold">SAPRAS</span>
                     </div>
-                    <p class="text-purple-100 text-lg">Bergabung dengan ribuan pengguna</p>
+                    <p class="text-blue-100 text-lg">Bergabung dengan ribuan pengguna</p>
                 </div>
 
                 <div class="space-y-6">
@@ -107,17 +129,17 @@
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Cepat & Mudah</h3>
-                            <p class="text-purple-100 text-sm">Daftar hanya dalam beberapa menit</p>
+                            <p class="text-blue-100 text-sm">Daftar hanya dalam beberapa menit</p>
                         </div>
                     </div>
 
                     <div class="flex space-x-4">
                         <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-users text-lg"></i>
+                            <i class="fas fa-headset text-lg"></i>
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Tim Support</h3>
-                            <p class="text-purple-100 text-sm">Kami siap membantu Anda 24/7</p>
+                            <p class="text-blue-100 text-sm">Kami siap membantu Anda kapan saja</p>
                         </div>
                     </div>
 
@@ -127,7 +149,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Premium Features</h3>
-                            <p class="text-purple-100 text-sm">Akses semua fitur tanpa biaya tambahan</p>
+                            <p class="text-blue-100 text-sm">Akses semua fitur tanpa biaya tambahan</p>
                         </div>
                     </div>
                 </div>
@@ -170,7 +192,7 @@
 
                     <div>
                         <label for="nama_pengguna" class="block text-sm font-medium text-gray-900 mb-2">
-                            <i class="fas fa-user mr-2 text-gray-600"></i>Nama Lengkap
+                            <i class="fas fa-user mr-2 text-blue-600"></i>Nama Lengkap
                         </label>
                         <input
                             id="nama_pengguna"
@@ -189,7 +211,7 @@
 
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-900 mb-2">
-                            <i class="fas fa-at mr-2 text-gray-600"></i>Username
+                            <i class="fas fa-at mr-2 text-blue-600"></i>Username
                         </label>
                         <input
                             id="username"
@@ -208,7 +230,7 @@
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-900 mb-2">
-                            <i class="fas fa-lock mr-2 text-gray-600"></i>Password
+                            <i class="fas fa-lock mr-2 text-blue-600"></i>Password
                         </label>
                         <input
                             id="password"
@@ -231,7 +253,7 @@
 
                     <div>
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-900 mb-2">
-                            <i class="fas fa-check-circle mr-2 text-gray-600"></i>Konfirmasi Password
+                            <i class="fas fa-check-circle mr-2 text-blue-600"></i>Konfirmasi Password
                         </label>
                         <input
                             id="password_confirmation"
@@ -249,9 +271,9 @@
 
                     <!-- Terms & Conditions -->
                     <div class="flex items-start space-x-2">
-                        <input type="checkbox" id="terms" required class="w-4 h-4 rounded border-gray-300 text-purple-600 mt-1">
+                        <input type="checkbox" id="terms" required class="w-4 h-4 rounded border-gray-300 text-blue-600 mt-1">
                         <label for="terms" class="text-sm text-gray-600">
-                            Saya setuju dengan <a href="#" class="text-purple-600 font-medium hover:underline">Syarat & Ketentuan</a>
+                            Saya setuju dengan <a href="#" class="text-blue-600 font-medium hover:underline">Syarat & Ketentuan</a>
                         </label>
                     </div>
 
@@ -267,7 +289,7 @@
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <p class="text-center text-gray-600 text-sm">
                         Sudah punya akun?
-                        <a href="{{ route('login') }}" class="font-semibold text-purple-600 hover:text-purple-700 transition">
+                        <a href="{{ route('login') }}" class="font-semibold text-blue-600 hover:text-blue-700 transition">
                             Masuk sekarang
                         </a>
                     </p>

@@ -17,12 +17,12 @@
 <div class="max-w-3xl mx-auto px-0">
     <div class="bg-white rounded-lg md:rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <!-- Header -->
-        <div class="p-4 md:p-6 bg-gradient-to-r from-emerald-500 to-emerald-600">
+        <div class="p-4 md:p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
             <h3 class="text-base md:text-lg font-bold text-white flex items-center">
-                <i class="fas fa-box mr-2 text-sm md:text-base"></i>
-                Form Permintaan Barang Baru
+                <i class="fas fa-plus-circle mr-2 text-sm md:text-base"></i>
+                Permintaan Barang Baru
             </h3>
-            <p class="text-emerald-100 text-xs md:text-sm mt-1">Untuk pengaduan: {{ $pengaduan->nama_pengaduan }}</p>
+            <p class="text-blue-100 text-xs md:text-sm mt-1">Untuk pengaduan: {{ $pengaduan->nama_pengaduan }}</p>
         </div>
 
         <form action="{{ route('petugas.item-request.store', $pengaduan) }}" method="POST" enctype="multipart/form-data" class="p-4 md:p-6">
@@ -55,7 +55,7 @@
                            name="nama_barang_baru" 
                            id="nama_barang_baru" 
                            value="{{ old('nama_barang_baru') }}"
-                           class="w-full px-3 md:px-4 py-2 md:py-3 text-xs md:text-base border-2 border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                           class="w-full px-3 md:px-4 py-2 md:py-3 text-xs md:text-base border-2 border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                            placeholder="Contoh: Kursi Kantor, Proyektor, AC"
                            required>
                 </div>
@@ -91,7 +91,7 @@
                     <textarea name="alasan_permintaan" 
                               id="alasan_permintaan" 
                               rows="4"
-                              class="w-full px-3 md:px-4 py-2 md:py-3 text-xs md:text-base border-2 border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none"
+                              class="w-full px-3 md:px-4 py-2 md:py-3 text-xs md:text-base border-2 border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
                               placeholder="Jelaskan mengapa barang ini dibutuhkan (kondisi kerusakan, urgensi, dll)"
                               required>{{ old('alasan_permintaan') }}</textarea>
                     <p class="text-xs text-slate-500 mt-1.5 md:mt-2 flex items-start">
@@ -105,11 +105,11 @@
                     <label for="foto_kerusakan" class="block text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3">
                         Foto Bukti Kerusakan <span class="text-red-500">*</span>
                     </label>
-                    <div class="mt-2 flex justify-center px-4 md:px-6 py-6 md:pt-8 md:pb-8 border-2 border-slate-300 border-dashed rounded-lg hover:border-emerald-400 transition-colors bg-slate-50">
+                    <div class="mt-2 flex justify-center px-4 md:px-6 py-6 md:pt-8 md:pb-8 border-2 border-slate-300 border-dashed rounded-lg hover:border-blue-400 transition-colors bg-slate-50">
                         <div class="space-y-2 text-center">
                             <i class="fas fa-cloud-upload-alt text-3xl md:text-4xl text-slate-400"></i>
                             <div class="flex flex-col sm:flex-row text-xs md:text-sm text-slate-600 items-center justify-center gap-1">
-                                <label for="foto_kerusakan" class="relative cursor-pointer bg-white px-2.5 py-1 rounded-md font-bold text-emerald-600 hover:text-emerald-700 focus-within:outline-none">
+                                <label for="foto_kerusakan" class="relative cursor-pointer bg-white px-2.5 py-1 rounded-md font-bold text-blue-600 hover:text-blue-700 focus-within:outline-none">
                                     <span>Upload foto</span>
                                     <input id="foto_kerusakan" 
                                            name="foto_kerusakan" 
@@ -171,7 +171,7 @@
                         Batal
                     </a>
                     <button type="submit"
-                            class="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs md:text-sm rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center justify-center">
+                            class="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs md:text-sm rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center justify-center">
                         <i class="fas fa-paper-plane mr-2 text-xs md:text-sm"></i>
                         Ajukan Permintaan
                     </button>

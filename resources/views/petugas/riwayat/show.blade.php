@@ -16,7 +16,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-6">
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="p-6 bg-gradient-to-r from-green-500 to-emerald-600">
+            <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-lg font-bold text-white flex items-center">
                     <i class="fas fa-info-circle mr-2"></i>
                     Informasi Pengaduan
@@ -31,15 +31,15 @@
                     <div>
                         <label class="text-xs font-semibold text-gray-500 uppercase">Tanggal Pengajuan</label>
                         <p class="text-lg font-bold text-gray-800 mt-1 flex items-center">
-                            <i class="far fa-calendar text-green-500 mr-2"></i>
+                            <i class="far fa-calendar text-blue-500 mr-2"></i>
                             {{ date('d/m/Y H:i', strtotime($pengaduan->tgl_pengajuan)) }}
                         </p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-gray-500 uppercase">Pengadu</label>
                         <div class="flex items-center mt-2">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                <span class="text-green-600 font-bold text-sm">{{ strtoupper(substr($pengaduan->user->nama_pengguna, 0, 2)) }}</span>
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-sm">{{ strtoupper(substr($pengaduan->user->nama_pengguna, 0, 2)) }}</span>
                             </div>
                             <p class="text-lg font-bold text-gray-800">{{ $pengaduan->user->nama_pengguna }}</p>
                         </div>
@@ -104,7 +104,7 @@
 
         @if($pengaduan->saran_petugas)
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="p-6 bg-gradient-to-r from-green-500 to-emerald-600">
+            <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-lg font-bold text-white flex items-center">
                     <i class="fas fa-comment-dots mr-2"></i>
                     Saran Petugas
@@ -119,7 +119,7 @@
 
     <div class="space-y-6">
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="p-6 bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
                 <h3 class="text-lg font-bold text-white flex items-center">
                     <i class="fas fa-history mr-2"></i>
                     Timeline
@@ -139,7 +139,7 @@
 
                     @if($pengaduan->tgl_verifikasi)
                     <div class="flex items-start">
-                        <div class="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                             <i class="fas fa-check text-white"></i>
                         </div>
                         <div class="ml-4 flex-1">
@@ -163,7 +163,7 @@
 
                     @if($pengaduan->tgl_selesai)
                     <div class="flex items-start">
-                        <div class="flex-shrink-0 w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                        <div class="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                             <i class="fas fa-flag-checkered text-white"></i>
                         </div>
                         <div class="ml-4 flex-1">

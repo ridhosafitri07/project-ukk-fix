@@ -15,14 +15,69 @@
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         .sidebar-link { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar-link.active { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-        .sidebar-link:hover:not(.active) { background: rgba(16, 185, 129, 0.08); transform: translateX(4px); }
+        .sidebar-link.active { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; }
+        .sidebar-link:hover:not(.active) { background: rgba(37, 99, 235, 0.08); transform: translateX(4px); }
         
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
         .animate-slide-in { animation: slideIn 0.3s ease-out; }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+        .animate-delay-1 { animation-delay: 0.1s; animation-fill-mode: both; }
+        .animate-delay-2 { animation-delay: 0.2s; animation-fill-mode: both; }
+        .animate-delay-3 { animation-delay: 0.3s; animation-fill-mode: both; }
+        .animate-delay-4 { animation-delay: 0.4s; animation-fill-mode: both; }
+        
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-only { display: none; }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-only { display: none; }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-emerald-50 to-green-50 min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
     <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: true, mobileMenu: false }">
         
         <!-- Sidebar Desktop -->
@@ -32,11 +87,11 @@
             <!-- Logo -->
             <div class="flex items-center justify-between p-5 border-b border-slate-100">
                 <div x-show="sidebarOpen" class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-wrench text-white text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">SAPRAS</h1>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent">SAPRAS</h1>
                         <p class="text-xs text-slate-500">Panel Petugas</p>
                     </div>
                 </div>
@@ -86,7 +141,7 @@
                             <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" 
                                  class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-200">
                         @else
-                            <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center ring-2 ring-slate-200">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-700 rounded-full flex items-center justify-center ring-2 ring-slate-200">
                                 <span class="text-white font-bold text-sm">
                                     {{ strtoupper(substr(auth()->user()->nama_pengguna, 0, 2)) }}
                                 </span>
@@ -152,11 +207,11 @@
             
             <div class="flex items-center justify-between p-5 border-b border-slate-100">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-wrench text-white text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">SAPRAS</h1>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent">SAPRAS</h1>
                         <p class="text-xs text-slate-500">Panel Petugas</p>
                     </div>
                 </div>
@@ -176,7 +231,7 @@
                     <a href="{{ route('petugas.pengaduan.index') }}" 
                        class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-700 {{ request()->routeIs('petugas.pengaduan.*') ? 'active' : '' }}">
                         <i class="fas fa-tasks w-5"></i>
-                        <span class="font-medium">Tugas Pengaduan</span>
+                        <span class="font-medium">Pengaduan Saya</span>
                     </a>
 
                     <a href="{{ route('petugas.riwayat.index') }}" 
@@ -202,7 +257,7 @@
                             <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" 
                                  class="w-10 h-10 rounded-full object-cover">
                         @else
-                            <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-700 rounded-full flex items-center justify-center">
                                 <span class="text-white font-bold text-sm">
                                     {{ strtoupper(substr(auth()->user()->nama_pengguna, 0, 2)) }}
                                 </span>
@@ -252,12 +307,12 @@
             <!-- Content -->
             <main class="flex-1 overflow-y-auto">
                 <div class="p-6 lg:p-8">
-                    {{-- SUCCESS NOTIFICATION - ONLY ONE PLACE --}}
+                    {{-- SUCCESS NOTIFICATION --}}
                     @if(session('success'))
-                    <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl shadow-sm animate-slide-in">
+                    <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-xl shadow-sm animate-slide-in">
                         <div class="flex items-center">
-                            <i class="fas fa-check-circle text-emerald-500 text-xl mr-3"></i>
-                            <p class="text-emerald-800 font-medium">{{ session('success') }}</p>
+                            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                            <p class="text-green-800 font-medium">{{ session('success') }}</p>
                         </div>
                     </div>
                     @endif

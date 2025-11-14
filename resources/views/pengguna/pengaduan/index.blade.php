@@ -6,28 +6,25 @@
 
 @section('content')
 <style>
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .list-item {
+        transition: all 0.2s ease;
     }
-    
-    .animate-fade-in-up {
-        animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
-    .card-hover {
-        transition: all 0.3s ease;
-    }
-    
-    .card-hover:hover {
-        transform: translateX(8px);
+
+    .list-item:hover {
         background: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05));
+        transform: translateX(4px);
+    }
+
+    .badge-temporary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-weight: 600;
     }
 </style>
 
@@ -37,17 +34,17 @@
         <i class="fas fa-home"></i>
         <span>Dashboard</span>
     </a>
-    <a href="{{ route('pengaduan.create') }}" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition flex items-center space-x-2">
+    <a href="{{ route('pengaduan.create') }}" class="btn-primary">
         <i class="fas fa-plus"></i>
         <span>Buat Pengaduan</span>
     </a>
 </div>
 
 <!-- Pengaduan List -->
-<div class="bg-white shadow-2xl overflow-hidden rounded-2xl border border-gray-100 animate-fade-in-up">
+<div class="card animate-fade-in-up">
     <ul role="list" class="divide-y divide-gray-100">
         @forelse($pengaduans as $index => $pengaduan)
-            <li class="card-hover animate-fade-in-up" style="animation-delay: {{ 0.05 * ($index + 1) }}s">
+            <li class="list-item animate-fade-in-up" style="animation-delay: {{ 0.05 * ($index + 1) }}s">
                 <a href="{{ route('pengaduan.show', $pengaduan) }}" class="block px-6 py-6">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4 flex-1 min-w-0">
@@ -69,12 +66,12 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <span class="px-4 py-2 text-xs font-bold rounded-full shadow-md whitespace-nowrap
-                                @if($pengaduan->status === 'Diajukan') bg-gradient-to-r from-yellow-400 to-orange-400 text-white
-                                @elseif($pengaduan->status === 'Disetujui') bg-gradient-to-r from-green-400 to-emerald-400 text-white
-                                @elseif($pengaduan->status === 'Ditolak') bg-gradient-to-r from-red-400 to-pink-400 text-white
-                                @elseif($pengaduan->status === 'Diproses') bg-gradient-to-r from-blue-400 to-indigo-400 text-white
-                                @else bg-gray-200 text-gray-800
+                            <span class="status-badge whitespace-nowrap
+                                @if($pengaduan->status === 'Diajukan') bg-yellow-100 text-yellow-800
+                                @elseif($pengaduan->status === 'Disetujui') bg-green-100 text-green-800
+                                @elseif($pengaduan->status === 'Ditolak') bg-red-100 text-red-800
+                                @elseif($pengaduan->status === 'Diproses') bg-indigo-100 text-indigo-800
+                                @elseif($pengaduan->status === 'Selesai') bg-emerald-100 text-emerald-800
                                 @endif">
                                 {{ $pengaduan->status }}
                             </span>
@@ -84,10 +81,10 @@
                     <!-- Temporary Items Badge -->
                     @if($pengaduan->temporary_items && $pengaduan->temporary_items->count() > 0)
                     <div class="mt-3 mb-3">
-                        <div class="inline-flex items-center space-x-2 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold">
+                        <span class="badge-temporary">
                             <i class="fas fa-hourglass-half"></i>
-                            <span>{{ $pengaduan->temporary_items->count() }} Barang Baru (Menunggu Persetujuan)</span>
-                        </div>
+                            {{ $pengaduan->temporary_items->count() }} Barang Baru
+                        </span>
                     </div>
                     @endif
                     
@@ -103,7 +100,7 @@
                                     break;
                                 case 'Disetujui':
                                     $progress = 50;
-                                    $statusColor = 'blue';
+                                    $statusColor = 'green';
                                     break;
                                 case 'Diproses':
                                     $progress = 75;
@@ -111,7 +108,7 @@
                                     break;
                                 case 'Selesai':
                                     $progress = 100;
-                                    $statusColor = 'green';
+                                    $statusColor = 'emerald';
                                     break;
                                 case 'Ditolak':
                                     $progress = 100;
@@ -135,12 +132,12 @@
         @empty
             <li class="px-6 py-16">
                 <div class="text-center">
-                    <div class="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <div class="w-32 h-32 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-inbox text-gray-400 text-5xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-700 mb-2">Belum Ada Pengaduan</h3>
                     <p class="text-gray-500 mb-6">Mulai buat pengaduan untuk melaporkan masalah sarana prasarana</p>
-                    <a href="{{ route('pengaduan.create') }}" class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition">
+                    <a href="{{ route('pengaduan.create') }}" class="btn-primary">
                         <i class="fas fa-plus"></i>
                         <span>Buat Pengaduan Pertama</span>
                     </a>
@@ -152,7 +149,7 @@
 
 @if($pengaduans->count() > 0)
     <div class="mt-8 flex justify-center">
-        <div class="bg-white px-6 py-4 rounded-2xl shadow-lg border border-gray-100">
+        <div class="bg-white px-6 py-4 rounded-xl shadow-lg border border-gray-100">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-info-circle text-blue-600"></i>
                 <span class="text-sm text-gray-700">Menampilkan <span class="font-bold text-blue-600">{{ $pengaduans->count() }}</span> pengaduan</span>

@@ -3,35 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SAPRAS</title>
+    <title>Masuk - SAPRAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        :root {
+            --primary-blue: #2563eb;
+            --primary-blue-light: #3b82f6;
+            --accent-purple: #8b5cf6;
         }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+        }
+
         .gradient-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .gradient-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
         }
+
         .input-field {
             background: #f8f9fa;
             border: 2px solid #e0e0e0;
             transition: all 0.3s ease;
         }
+
         .input-field:focus {
             background: #fff;
-            border-color: #667eea;
+            border-color: var(--primary-blue);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
+
         .feature-list {
             animation: slideInLeft 0.6s ease;
         }
+
         @keyframes slideInLeft {
             from {
                 opacity: 0;
@@ -42,6 +58,7 @@
                 transform: translateX(0);
             }
         }
+
         @keyframes slideInRight {
             from {
                 opacity: 0;
@@ -52,14 +69,16 @@
                 transform: translateX(0);
             }
         }
+
         .form-container {
             animation: slideInRight 0.6s ease;
         }
+
         .icon-circle {
             width: 60px;
             height: 60px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -71,7 +90,7 @@
 <body class="bg-gray-50">
     <div class="min-h-screen flex">
         <!-- Left Section - Features -->
-        <div class="hidden lg:flex lg:w-1/2 gradient-bg text-white items-center justify-center p-12">
+        <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-purple-700 text-white items-center justify-center p-12">
             <div class="feature-list max-w-md">
                 <div class="mb-12">
                     <div class="flex items-center space-x-3 mb-4">
@@ -80,7 +99,7 @@
                         </div>
                         <span class="text-3xl font-bold">SAPRAS</span>
                     </div>
-                    <p class="text-purple-100 text-lg">Sistem Manajemen Pengaduan Sarana & Prasarana</p>
+                    <p class="text-blue-100 text-lg">Sistem Manajemen Pengaduan Sarana & Prasarana</p>
                 </div>
 
                 <div class="space-y-6">
@@ -90,7 +109,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Laporan Mudah</h3>
-                            <p class="text-purple-100 text-sm">Buat laporan pengaduan dengan detail lengkap</p>
+                            <p class="text-blue-100 text-sm">Buat laporan pengaduan dengan detail lengkap</p>
                         </div>
                     </div>
 
@@ -100,7 +119,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Pantau Real-time</h3>
-                            <p class="text-purple-100 text-sm">Lihat status pengaduan Anda setiap saat</p>
+                            <p class="text-blue-100 text-sm">Lihat status pengaduan Anda setiap saat</p>
                         </div>
                     </div>
 
@@ -110,7 +129,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Data Aman</h3>
-                            <p class="text-purple-100 text-sm">Enkripsi tingkat enterprise untuk data Anda</p>
+                            <p class="text-blue-100 text-sm">Enkripsi tingkat enterprise untuk data Anda</p>
                         </div>
                     </div>
                 </div>
@@ -162,7 +181,7 @@
 
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-900 mb-2">
-                            <i class="fas fa-user mr-2 text-gray-600"></i>Username
+                            <i class="fas fa-user mr-2 text-blue-600"></i>Username
                         </label>
                         <input
                             id="username"
@@ -181,7 +200,7 @@
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-900 mb-2">
-                            <i class="fas fa-lock mr-2 text-gray-600"></i>Password
+                            <i class="fas fa-lock mr-2 text-blue-600"></i>Password
                         </label>
                         <input
                             id="password"
@@ -199,7 +218,7 @@
 
                     <button
                         type="submit"
-                        class="gradient-btn w-full py-3 px-4 text-white font-semibold rounded-lg flex items-center justify-center space-x-2"
+                        class="gradient-btn w-full py-3 px-4 text-white font-semibold rounded-lg flex items-center justify-center space-x-2 mt-6"
                     >
                         <span>Masuk</span>
                         <i class="fas fa-arrow-right"></i>
@@ -209,13 +228,13 @@
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <p class="text-center text-gray-600 text-sm">
                         Belum punya akun?
-                        <a href="{{ route('register') }}" class="font-semibold text-purple-600 hover:text-purple-700 transition">
+                        <a href="{{ route('register') }}" class="font-semibold text-blue-600 hover:text-blue-700 transition">
                             Daftar sekarang
                         </a>
                     </p>
                 </div>
 
-                <!-- Demo Info -->
+                <!-- Info Box -->
                 <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p class="text-xs text-blue-700 mb-2">
                         <i class="fas fa-info-circle mr-2"></i><strong>Demo Account:</strong>

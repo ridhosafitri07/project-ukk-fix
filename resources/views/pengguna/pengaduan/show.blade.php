@@ -6,287 +6,288 @@
 
 @section('content')
 <style>
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .status-badge {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
     }
-    
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+    .status-badge.draft     { @apply bg-yellow-100 text-yellow-800; }
+    .status-badge.process   { @apply bg-blue-100 text-blue-800; }
+    .status-badge.approved  { @apply bg-green-100 text-green-800; }
+    .status-badge.rejected  { @apply bg-red-100 text-red-800; }
+    .status-badge.completed { @apply bg-emerald-100 text-emerald-800; }
+
+    .timeline-step {
+        @apply flex items-start gap-3 pb-4 last:pb-0;
     }
-    
-    .animate-fade-in-up {
-        animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
     .timeline-dot {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        @apply w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold;
+    }
+    .timeline-dot.done { @apply bg-green-500; }
+    .timeline-dot.pending { @apply bg-gray-300; }
+
+    .timeline-line {
+        @apply absolute left-[15px] top-6 bottom-0 w-0.5 bg-gray-200;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .timeline-line {
+            left: 12px !important;
+        }
+        .timeline-step {
+            gap: 1rem !important;
+        }
+        .timeline-dot {
+            width: 20px !important;
+            height: 20px !important;
+            font-size: 0.75rem !important;
+        }
     }
 </style>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Main Content -->
     <div class="lg:col-span-2 space-y-6">
-        <!-- Pengaduan Info Card -->
-        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 animate-fade-in-up">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <h3 class="text-2xl font-bold text-white mb-2">{{ $pengaduan->nama_pengaduan }}</h3>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-4 py-2 text-xs font-bold rounded-full shadow-md
-                                @if($pengaduan->status === 'Diajukan') bg-yellow-400 text-white
-                                @elseif($pengaduan->status === 'Disetujui') bg-green-400 text-white
-                                @elseif($pengaduan->status === 'Ditolak') bg-red-400 text-white
-                                @elseif($pengaduan->status === 'Diproses') bg-blue-400 text-white
-                                @else bg-gray-200 text-gray-800
-                                @endif">
-                                {{ $pengaduan->status }}
-                            </span>
-                        </div>
-                    </div>
-                    @if($pengaduan->status === 'Diajukan')
-                    <div class="flex space-x-2 ml-4">
-                        <a href="{{ route('pengaduan.edit', $pengaduan) }}" 
-                            class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-4 py-2 rounded-xl transition flex items-center space-x-2">
-                            <i class="fas fa-edit"></i>
-                            <span class="hidden sm:inline">Edit</span>
+        <!-- Detail Pengaduan Card -->
+        <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <!-- Judul & Status -->
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-gray-900">{{ $pengaduan->nama_pengaduan }}</h2>
+                    @php
+                        $statusClass = match($pengaduan->status) {
+                            'Diajukan' => 'draft',
+                            'Disetujui' => 'approved',
+                            'Diproses' => 'process',
+                            'Selesai' => 'completed',
+                            'Ditolak' => 'rejected',
+                            default => 'draft',
+                        };
+                    @endphp
+                    <span class="status-badge {{ $statusClass }} mt-1 inline-flex">
+                        <span class="w-2 h-2 rounded-full bg-current"></span>
+                        {{ $pengaduan->status }}
+                    </span>
+                </div>
+                @if($pengaduan->status === 'Diajukan')
+                    <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                        <a href="{{ route('pengaduan.edit', $pengaduan) }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-edit text-xs"></i> Edit
                         </a>
                         <form action="{{ route('pengaduan.destroy', $pengaduan) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" 
-                                class="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl transition flex items-center space-x-2"
-                                onclick="return confirm('Apakah Anda yakin ingin menghapus pengaduan ini?')">
-                                <i class="fas fa-trash"></i>
-                                <span class="hidden sm:inline">Hapus</span>
+                            @csrf @method('DELETE')
+                            <button type="submit"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 text-red-700 hover:bg-red-50 rounded-lg transition-colors text-sm"
+                                onclick="return confirm('Yakin ingin menghapus pengaduan ini?')">
+                                <i class="fas fa-trash text-xs"></i> Hapus
                             </button>
                         </form>
                     </div>
-                    @endif
-                </div>
-            </div>
-            
-            <div class="p-6 space-y-6">
-                <!-- Lokasi & Tanggal -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex items-center space-x-4 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-map-marker-alt text-white"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-medium uppercase">Lokasi</p>
-                            <p class="text-base font-bold text-gray-900">{{ $pengaduan->lokasi }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-calendar text-white"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-medium uppercase">Tanggal</p>
-                            <p class="text-base font-bold text-gray-900">{{ \Carbon\Carbon::parse($pengaduan->tgl_pengajuan)->format('d M Y') }}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Deskripsi -->
-                <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl border-2 border-gray-200">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-align-left text-white"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-900">Deskripsi Masalah</h4>
-                    </div>
-                    <p class="text-gray-700 leading-relaxed">{{ $pengaduan->deskripsi }}</p>
-                </div>
-                
-                <!-- Saran Petugas -->
-                @if($pengaduan->saran_petugas)
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-200">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-user-tie text-white"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-900">Saran Petugas</h4>
-                    </div>
-                    <p class="text-gray-700 leading-relaxed">{{ $pengaduan->saran_petugas }}</p>
-                </div>
                 @endif
             </div>
-        </div>
-        
-        <!-- Foto Bukti -->
-        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 animate-fade-in-up" style="animation-delay: 0.1s">
-            <div class="bg-gradient-to-r from-orange-500 to-red-600 px-6 py-4">
-                <h4 class="text-xl font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-camera"></i>
-                    <span>Foto Bukti</span>
-                </h4>
-            </div>
-            <div class="p-6">
-                @if($pengaduan->foto)
-                    <div class="relative group">
-                        <img src="{{ asset('storage/' . $pengaduan->foto) }}" 
-                             alt="Foto Pengaduan" 
-                             class="w-full rounded-2xl shadow-2xl border-4 border-white">
-                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-2xl flex items-center justify-center">
-                            <a href="{{ asset('storage/' . $pengaduan->foto) }}" target="_blank" 
-                               class="opacity-0 group-hover:opacity-100 bg-white text-blue-600 px-6 py-3 rounded-xl font-bold shadow-xl transform scale-90 group-hover:scale-100 transition-all duration-300 flex items-center space-x-2">
-                                <i class="fas fa-expand"></i>
-                                <span>Lihat Penuh</span>
-                            </a>
-                        </div>
+
+            <!-- Lokasi & Tanggal -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div class="flex items-center gap-3 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
+                        <i class="fas fa-map-marker-alt text-sm"></i>
                     </div>
-                @else
-                    <div class="text-center py-12 bg-gray-50 rounded-2xl">
-                        <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-image text-gray-400 text-4xl"></i>
-                        </div>
-                        <p class="text-gray-500 font-medium">Tidak ada foto bukti</p>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Lokasi</p>
+                        <p class="text-gray-900 font-medium">{{ $pengaduan->lokasi }}</p>
                     </div>
-                @endif
+                </div>
+                <div class="flex items-center gap-3 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                        <i class="fas fa-calendar-day text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Tanggal Pengajuan</p>
+                        <p class="text-gray-900 font-medium">
+                            {{ \Carbon\Carbon::parse($pengaduan->tgl_pengajuan)->translatedFormat('d F Y') }}
+                        </p>
+                    </div>
+                </div>
             </div>
+
+            <!-- Deskripsi Masalah -->
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                    <i class="fas fa-align-left text-sm"></i> Deskripsi Masalah
+                </h3>
+                <div class="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line text-sm sm:text-base">
+                        {{ $pengaduan->deskripsi }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Saran Petugas -->
+            @if($pengaduan->saran_petugas)
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                    <i class="fas fa-user-tie text-sm"></i> Saran Petugas
+                </h3>
+                <div class="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line text-sm sm:text-base">
+                        {{ $pengaduan->saran_petugas }}
+                    </p>
+                </div>
+            </div>
+            @endif
         </div>
 
-        <!-- Temporary Items Section -->
-        @if($pengaduan->temporary_items && $pengaduan->temporary_items->count() > 0)
-        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 animate-fade-in-up" style="animation-delay: 0.15s">
-            <div class="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4">
-                <h4 class="text-xl font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-hourglass-half"></i>
-                    <span>Permintaan Barang Baru</span>
-                    <span class="ml-auto bg-white/20 px-3 py-1 rounded-full text-sm">{{ $pengaduan->temporary_items->count() }}</span>
-                </h4>
-            </div>
-            <div class="p-6 space-y-4">
-                @foreach($pengaduan->temporary_items as $temp)
-                <div class="border-2 border-purple-100 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-pink-50">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex-1">
-                            <h5 class="text-lg font-bold text-gray-900">{{ $temp->nama_barang_baru }}</h5>
-                            <p class="text-sm text-gray-600 mt-1">
-                                <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>
-                                Lokasi: <strong>{{ $temp->lokasi_barang_baru }}</strong>
-                            </p>
-                        </div>
-                        <span class="px-4 py-2 text-xs font-bold rounded-full whitespace-nowrap ml-2 bg-yellow-100 text-yellow-800">
-                            Menunggu Persetujuan
+        <!-- Foto Bukti -->
+        <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm sm:text-base">
+                <i class="fas fa-camera text-sm"></i> Foto Bukti
+            </h3>
+            @if($pengaduan->foto)
+                <div class="relative group cursor-pointer">
+                    <img src="{{ asset('storage/' . $pengaduan->foto) }}"
+                         alt="Bukti Pengaduan"
+                         class="w-full rounded-lg border border-gray-200 shadow-sm object-contain max-h-96 sm:max-h-[500px]">
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                        <span class="text-white font-medium flex items-center gap-1.5 text-sm sm:text-base">
+                            <i class="fas fa-expand"></i> Lihat Penuh
                         </span>
                     </div>
+                    <a href="{{ asset('storage/' . $pengaduan->foto) }}" target="_blank"
+                       class="absolute inset-0"></a>
+                </div>
+            @else
+                <div class="py-8 sm:py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <i class="fas fa-image text-gray-400 text-3xl sm:text-4xl mb-3"></i>
+                    <p class="text-gray-500 text-sm sm:text-base">Tidak ada foto bukti yang dilampirkan</p>
+                </div>
+            @endif
+        </div>
 
+        <!-- Permintaan Barang Baru -->
+        @if($pengaduan->temporary_items?->count() > 0)
+        <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm sm:text-base">
+                <i class="fas fa-box-open text-sm"></i> Permintaan Barang Baru
+                <span class="ml-auto bg-gray-100 text-gray-700 text-xs sm:text-sm font-medium px-2.5 py-1 rounded-full">
+                    {{ $pengaduan->temporary_items->count() }} item
+                </span>
+            </h3>
+            <div class="space-y-4">
+                @foreach($pengaduan->temporary_items as $temp)
+                <div class="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 text-sm sm:text-base">{{ $temp->nama_barang_baru }}</h4>
+                            <p class="text-xs sm:text-sm text-gray-600 flex items-center gap-1 mt-1">
+                                <i class="fas fa-map-marker-alt text-gray-500"></i>
+                                {{ $temp->lokasi_barang_baru }}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-2">
+                                Diajukan: {{ \Carbon\Carbon::parse($temp->tanggal_permintaan)->format('d M Y, H:i') }}
+                            </p>
+                        </div>
+                        <span class="status-badge draft text-xs sm:text-sm px-2.5 py-1">
+                            <i class="fas fa-clock mr-1"></i> Menunggu
+                        </span>
+                    </div>
                     @if($temp->foto_kerusakan)
-                    <div class="mb-3">
-                        <p class="text-xs font-semibold text-gray-600 mb-2">Foto Kerusakan:</p>
+                    <div class="mt-3">
+                        <p class="text-xs font-medium text-gray-600 mb-2">Foto Kerusakan:</p>
                         <div class="relative group inline-block">
-                            <img src="{{ asset('storage/' . $temp->foto_kerusakan) }}" 
-                                 alt="Foto Kerusakan" 
-                                 class="h-24 rounded-lg shadow-md border-2 border-gray-200 cursor-pointer hover:border-purple-400 transition">
-                            <a href="{{ asset('storage/' . $temp->foto_kerusakan) }}" target="_blank" 
-                               class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                <i class="fas fa-expand text-white"></i>
+                            <img src="{{ asset('storage/' . $temp->foto_kerusakan) }}"
+                                 alt="Kerusakan"
+                                 class="h-20 sm:h-24 rounded-lg border border-gray-200 object-cover">
+                            <a href="{{ asset('storage/' . $temp->foto_kerusakan) }}" target="_blank"
+                               class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-expand text-white text-lg"></i>
                             </a>
                         </div>
                     </div>
                     @endif
-
-                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 pt-2 border-t border-purple-200">
-                        <div>
-                            <span class="font-semibold">Tanggal Permintaan:</span><br>
-                            {{ \Carbon\Carbon::parse($temp->tanggal_permintaan)->format('d M Y H:i') }}
-                        </div>
-                    </div>
-
                 </div>
                 @endforeach
             </div>
         </div>
         @endif
     </div>
-    
+
     <!-- Sidebar -->
     <div class="space-y-6">
-        <!-- Status Timeline -->
-        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 animate-fade-in-up" style="animation-delay: 0.2s">
-            <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
-                <h4 class="text-xl font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-list-check"></i>
-                    <span>Status Timeline</span>
-                </h4>
-            </div>
-            <div class="p-6">
+        <!-- Alur Status -->
+        <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm sm:text-base">
+                <i class="fas fa-route text-sm"></i> Alur Status
+            </h3>
+            <div class="relative">
+                <div class="timeline-line"></div>
                 <div class="space-y-4">
                     <!-- Diajukan -->
-                    <div class="flex items-start space-x-3">
-                        <div class="timeline-dot w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                            <i class="fas fa-check text-white text-xs"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-900">Diajukan</p>
+                    <div class="timeline-step">
+                        <div class="timeline-dot done">✓</div>
+                        <div>
+                            <p class="font-medium text-gray-900 text-sm sm:text-base">Diajukan</p>
                             <p class="text-xs text-gray-500">Pengaduan telah diajukan</p>
                         </div>
                     </div>
-                    
-                    <!-- Disetujui/Ditolak -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-gradient-to-br {{ in_array($pengaduan->status, ['Disetujui', 'Diproses', 'Selesai']) ? 'from-green-400 to-emerald-400' : ($pengaduan->status === 'Ditolak' ? 'from-red-400 to-pink-400' : 'from-gray-300 to-gray-400') }} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                            <i class="fas {{ in_array($pengaduan->status, ['Disetujui', 'Diproses', 'Selesai']) || $pengaduan->status === 'Ditolak' ? 'fa-check' : 'fa-clock' }} text-white text-xs"></i>
+
+                    <!-- Verifikasi -->
+                    <div class="timeline-step">
+                        <div class="timeline-dot {{ in_array($pengaduan->status, ['Disetujui', 'Diproses', 'Selesai', 'Ditolak']) ? 'done' : 'pending' }}">
+                            {{ in_array($pengaduan->status, ['Disetujui', 'Diproses', 'Selesai', 'Ditolak']) ? '✓' : '' }}
                         </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-900">Verifikasi</p>
-                            <p class="text-xs text-gray-500">{{ in_array($pengaduan->status, ['Disetujui', 'Diproses', 'Selesai']) ? 'Disetujui' : ($pengaduan->status === 'Ditolak' ? 'Ditolak' : 'Menunggu verifikasi') }}</p>
+                        <div>
+                            <p class="font-medium text-gray-900 text-sm sm:text-base">Verifikasi</p>
+                            <p class="text-xs text-gray-500">
+                                {{ $pengaduan->status === 'Ditolak' ? 'Ditolak' : (in_array($pengaduan->status, ['Disetujui', 'Diproses', 'Selesai']) ? 'Disetujui' : 'Menunggu verifikasi') }}
+                            </p>
                         </div>
                     </div>
-                    
+
                     <!-- Diproses -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-gradient-to-br {{ in_array($pengaduan->status, ['Diproses', 'Selesai']) ? 'from-blue-400 to-indigo-400' : 'from-gray-300 to-gray-400' }} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                            <i class="fas {{ in_array($pengaduan->status, ['Diproses', 'Selesai']) ? 'fa-check' : 'fa-clock' }} text-white text-xs"></i>
+                    <div class="timeline-step">
+                        <div class="timeline-dot {{ in_array($pengaduan->status, ['Diproses', 'Selesai']) ? 'done' : 'pending' }}">
+                            {{ in_array($pengaduan->status, ['Diproses', 'Selesai']) ? '✓' : '' }}
                         </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-900">Dalam Proses</p>
-                            <p class="text-xs text-gray-500">{{ in_array($pengaduan->status, ['Diproses', 'Selesai']) ? 'Sedang ditangani' : 'Belum diproses' }}</p>
+                        <div>
+                            <p class="font-medium text-gray-900 text-sm sm:text-base">Diproses</p>
+                            <p class="text-xs text-gray-500">
+                                {{ in_array($pengaduan->status, ['Diproses', 'Selesai']) ? 'Sedang ditangani' : 'Belum diproses' }}
+                            </p>
                         </div>
                     </div>
-                    
+
                     <!-- Selesai -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-gradient-to-br {{ $pengaduan->status === 'Selesai' ? 'from-green-500 to-emerald-600' : 'from-gray-300 to-gray-400' }} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                            <i class="fas {{ $pengaduan->status === 'Selesai' ? 'fa-check' : 'fa-clock' }} text-white text-xs"></i>
+                    <div class="timeline-step">
+                        <div class="timeline-dot {{ $pengaduan->status === 'Selesai' ? 'done' : 'pending' }}">
+                            {{ $pengaduan->status === 'Selesai' ? '✓' : '' }}
                         </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-900">Selesai</p>
-                            <p class="text-xs text-gray-500">{{ $pengaduan->status === 'Selesai' ? 'Pengaduan selesai' : 'Belum selesai' }}</p>
+                        <div>
+                            <p class="font-medium text-gray-900 text-sm sm:text-base">Selesai</p>
+                            <p class="text-xs text-gray-500">
+                                {{ $pengaduan->status === 'Selesai' ? 'Pengaduan selesai' : 'Belum selesai' }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Quick Actions -->
-        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 animate-fade-in-up" style="animation-delay: 0.3s">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-                <h4 class="text-xl font-bold text-white flex items-center space-x-2">
-                    <i class="fas fa-bolt"></i>
-                    <span>Aksi Cepat</span>
-                </h4>
-            </div>
-            <div class="p-6 space-y-3">
-                <a href="{{ route('pengaduan.index') }}" class="block w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md hover:shadow-xl text-center">
+
+        <!-- Aksi Cepat -->
+        <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm sm:text-base">
+                <i class="fas fa-bolt text-sm"></i> Aksi Cepat
+            </h3>
+            <div class="space-y-3">
+                <a href="{{ route('pengaduan.index') }}"
+                   class="block w-full px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg font-medium text-center text-sm sm:text-base transition-colors">
                     <i class="fas fa-list mr-2"></i> Lihat Semua Pengaduan
                 </a>
-                <a href="{{ route('pengaduan.create') }}" class="block w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md hover:shadow-xl text-center">
-                    <i class="fas fa-plus mr-2"></i> Buat Pengaduan Baru
+                <a href="{{ route('pengaduan.create') }}"
+                   class="block w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium text-center text-sm sm:text-base transition-colors">
+                    <i class="fas fa-plus-circle mr-2"></i> Buat Pengaduan Baru
                 </a>
-                <a href="{{ route('pengguna.dashboard') }}" class="block w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md hover:shadow-xl text-center">
+                <a href="{{ route('pengguna.dashboard') }}"
+                   class="block w-full px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-medium text-center text-sm sm:text-base transition-colors">
                     <i class="fas fa-home mr-2"></i> Kembali ke Dashboard
                 </a>
             </div>

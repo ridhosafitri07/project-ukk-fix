@@ -1,322 +1,387 @@
-@extends('layouts.' . auth()->user()->role)
+@extends('layouts.pengguna')
 
 @section('title', 'Edit Profil')
 @section('header', 'Edit Profil')
 @section('subheader', 'Perbarui informasi akun Anda')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 sm:px-0">
-    <!-- Back Button -->
-    <div class="mb-4">
-        <a href="{{ route('profile.index') }}" 
-           class="inline-flex items-center px-3 py-2 bg-white rounded-lg text-slate-700 hover:bg-slate-50 transition-all shadow-sm border border-slate-200 text-sm">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Kembali
-        </a>
-    </div>
+<style>
+    .stat-card-modern {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 12px -2px rgba(0,0,0,0.03);
+    }
 
+    .stat-card-modern:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(139, 92, 246, 0.2);
+    }
+
+    .form-label {
+        @apply block text-sm font-semibold text-gray-700 mb-2;
+    }
+
+    .form-input, .form-textarea {
+        @apply w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition;
+    }
+
+    .btn-gradient {
+        @apply px-6 py-3 font-bold rounded-xl text-white shadow-lg transition-all;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px -4px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-outline {
+        @apply px-6 py-3 font-bold rounded-xl border-2 text-purple-600 border-purple-200 hover:bg-purple-50 transition;
+    }
+
+    .preview-avatar {
+        transition: all 0.3s ease;
+    }
+
+    .preview-avatar:hover {
+        transform: scale(1.08) rotate(3deg);
+    }
+
+    .password-toggle {
+        @apply absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-purple-600;
+    }
+</style>
+
+<div class="space-y-8">
+
+    <!-- ✅ Success Notification -->
     @if(session('success'))
-    <div class="mb-4 bg-emerald-50 border-l-4 border-emerald-500 p-3 rounded-r-xl shadow-sm animate-slide-in">
-        <div class="flex items-center">
-            <i class="fas fa-check-circle text-emerald-500 mr-2"></i>
-            <span class="text-emerald-800 font-medium text-sm">{{ session('success') }}</span>
+    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-5 text-white shadow-lg animate-fade-in-up">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle text-2xl"></i>
+            <div>
+                <p class="font-bold text-lg">Berhasil!</p>
+                <p>{{ session('success') }}</p>
+            </div>
         </div>
     </div>
     @endif
 
-    <!-- Edit Profile Form - Compact -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-4">
-        <div class="p-4 bg-gradient-to-r 
-            {{ auth()->user()->role === 'admin' ? 'from-indigo-500 to-purple-600' : 
-               (auth()->user()->role === 'petugas' ? 'from-emerald-500 to-green-600' : 
-               'from-blue-500 to-sky-600') }}">
-            <h3 class="text-base font-bold text-white flex items-center">
-                <i class="fas fa-user-edit mr-2"></i>
-                Informasi Profil
-            </h3>
-        </div>
-        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="p-4 md:p-6">
+    <!-- 🖼️ Edit Profile Card -->
+    <div class="stat-card-modern animate-fade-in-up">
+        <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+            <i class="fas fa-user-edit text-purple-500"></i>
+            Edit Profil
+        </h2>
+
+        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
             @csrf
             @method('PUT')
 
-            <div class="space-y-4">
-                <!-- Profile Photo - Compact -->
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Foto Profil</label>
-                    <div class="flex items-center gap-4">
-                        <div class="relative group">
+            <!-- 📸 Photo Upload Section -->
+            <div class="border-b border-gray-100 pb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
+                    <i class="fas fa-camera text-purple-500"></i>
+                    Foto Profil
+                </h3>
+
+                <div class="flex flex-col md:flex-row items-start gap-8">
+                    <!-- Preview -->
+                    <div class="relative group">
+                        <div class="relative">
                             @if($user->foto_profil)
-                                <img src="{{ asset('storage/' . $user->foto_profil) }}" 
-                                     alt="Profile Photo" 
-                                     id="preview-image"
-                                     class="w-20 h-20 rounded-xl object-cover ring-2 ring-slate-200 shadow-md">
+                                <img id="preview-image" src="{{ asset('storage/' . $user->foto_profil) }}"
+                                     alt="Preview Foto"
+                                     class="w-32 h-32 rounded-2xl object-cover ring-2 ring-gray-200 shadow-md preview-avatar">
                             @else
-                                <div id="preview-initials" class="w-20 h-20 rounded-xl flex items-center justify-center text-white font-bold text-xl ring-2 ring-slate-200 shadow-md
-                                    {{ $user->role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-purple-700' : 
-                                       ($user->role === 'petugas' ? 'bg-gradient-to-br from-emerald-500 to-green-700' : 
-                                       'bg-gradient-to-br from-blue-500 to-blue-700') }}">
-                                    {{ strtoupper(substr($user->nama_pengguna, 0, 2)) }}
+                                <div id="preview-initials" class="w-32 h-32 rounded-2xl flex items-center justify-center text-white font-black text-3xl ring-2 ring-gray-200 shadow-md bg-gradient-to-br from-purple-500 to-pink-500 preview-avatar">
+                                    {{ strtoupper(substr($user->nama_pengguna, 0, 1)) }}
                                 </div>
-                                <img src="" alt="Preview" id="preview-image" class="w-20 h-20 rounded-xl object-cover ring-2 ring-slate-200 shadow-md hidden">
+                                <img id="preview-image" src="" alt="Preview" class="w-32 h-32 rounded-2xl object-cover ring-2 ring-gray-200 shadow-md preview-avatar hidden">
                             @endif
-                            <div class="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <i class="fas fa-camera text-white"></i>
+                            <div class="absolute inset-0 bg-black/30 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <i class="fas fa-camera text-white text-xl"></i>
                             </div>
                         </div>
-                        <div class="flex-1">
-                            <input type="file" name="foto_profil" id="foto_profil" accept="image/*" 
-                                   class="block w-full text-xs text-slate-500
-                                   file:mr-3 file:py-2 file:px-3
-                                   file:rounded-lg file:border-0
-                                   file:text-xs file:font-semibold
-                                   file:bg-gradient-to-r 
-                                   {{ auth()->user()->role === 'admin' ? 'file:from-indigo-50 file:to-purple-50 file:text-indigo-700' : 
-                                      (auth()->user()->role === 'petugas' ? 'file:from-emerald-50 file:to-green-50 file:text-emerald-700' : 
-                                      'file:from-blue-50 file:to-sky-50 file:text-blue-700') }}
-                                   hover:file:brightness-95 cursor-pointer">
-                            <p class="mt-1 text-xs text-slate-500">JPG, PNG max 2MB</p>
-                            @error('foto_profil')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                            
-                            @if($user->foto_profil)
-                            <form action="{{ route('profile.delete-photo') }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin ingin menghapus foto?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium">
-                                    <i class="fas fa-trash mr-1"></i>
-                                    Hapus Foto
-                                </button>
-                            </form>
-                            @endif
-                        </div>
+                        <p class="mt-3 text-center text-sm text-gray-600 font-medium">Klik untuk ganti</p>
+                    </div>
+
+                    <!-- Upload & Info -->
+                    <div class="flex-1">
+                        <label for="foto_profil" class="block mb-3">
+                            <span class="cursor-pointer inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 font-semibold rounded-xl hover:from-purple-100 hover:to-pink-100 border border-purple-200 transition">
+                                <i class="fas fa-upload"></i>
+                                <span>Pilih Gambar</span>
+                            </span>
+                            <input type="file" name="foto_profil" id="foto_profil" accept="image/*" class="hidden">
+                        </label>
+
+                        <p class="mt-3 text-sm text-gray-600">
+                            Format: JPG, PNG, GIF ≤ 2MB<br>
+                            Disarankan ukuran ≥ 400×400 px
+                        </p>
+
+                        @error('foto_profil')
+                            <p class="mt-2 text-sm text-red-600 font-medium flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                        <!-- Delete Photo -->
+                        @if($user->foto_profil)
+                        <form action="{{ route('profile.delete-photo') }}" method="POST" class="mt-4 inline-block" onsubmit="return confirm('Yakin hapus foto profil?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-semibold">
+                                <i class="fas fa-trash-alt"></i> Hapus Foto
+                            </button>
+                        </form>
+                        @endif
                     </div>
                 </div>
+            </div>
 
-                <!-- Form Fields Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- ✍️ Personal Info -->
+            <div class="border-b border-gray-100 pb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
+                    <i class="fas fa-user text-purple-500"></i>
+                    Informasi Pribadi
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Nama Lengkap -->
                     <div>
-                        <label for="nama_pengguna" class="block text-sm font-bold text-slate-700 mb-2">
-                            Nama Lengkap <span class="text-red-500">*</span>
-                        </label>
+                        <label for="nama_pengguna" class="form-label">Nama Lengkap <span class="text-red-500">*</span></label>
                         <input type="text" name="nama_pengguna" id="nama_pengguna" required
                                value="{{ old('nama_pengguna', $user->nama_pengguna) }}"
-                               class="w-full px-3 py-2 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">
+                               class="form-input">
                         @error('nama_pengguna')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Username -->
                     <div>
-                        <label for="username" class="block text-sm font-bold text-slate-700 mb-2">
-                            Username <span class="text-red-500">*</span>
-                        </label>
+                        <label for="username" class="form-label">Username <span class="text-red-500">*</span></label>
                         <input type="text" name="username" id="username" required
                                value="{{ old('username', $user->username) }}"
-                               class="w-full px-3 py-2 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">
+                               class="form-input">
                         @error('username')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Telepon -->
+                    <div>
+                        <label for="telp_user" class="form-label">Nomor Telepon</label>
+                        <input type="text" name="telp_user" id="telp_user"
+                               value="{{ old('telp_user', $user->telp_user) }}"
+                               placeholder="Contoh: 081234567890"
+                               class="form-input">
+                        @error('telp_user')
+                            <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="md:col-span-2">
+                        <label for="bio" class="form-label">Bio / Tentang Anda</label>
+                        <textarea name="bio" id="bio" rows="3" maxlength="500"
+                                  placeholder="Ceritakan tentang diri Anda (maks. 500 karakter)..."
+                                  class="form-textarea resize-none">{{ old('bio', $user->bio) }}</textarea>
+                        <div class="flex justify-between mt-2">
+                            <p class="text-xs text-gray-500">Karakter: <span id="charCount" class="font-bold text-purple-600">{{ strlen($user->bio ?? '') }}/500</span></p>
+                        </div>
+                        @error('bio')
+                            <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
+            </div>
 
-                <!-- Nomor Telepon -->
-                <div>
-                    <label for="telp_user" class="block text-sm font-bold text-slate-700 mb-2">
-                        Nomor Telepon
-                    </label>
-                    <input type="text" name="telp_user" id="telp_user"
-                           value="{{ old('telp_user', $user->telp_user) }}"
-                           placeholder="081234567890"
-                           class="w-full px-3 py-2 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all">
-                    @error('telp_user')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
+            <!-- 🔐 Account Info (Read-only) -->
+            <div class="border-b border-gray-100 pb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-purple-500"></i>
+                    Informasi Akun
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-600 font-medium">Role</p>
+                        <p class="text-gray-900 font-bold mt-1">{{ ucfirst($user->role) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 font-medium">Email</p>
+                        <p class="text-gray-900 font-bold mt-1 break-all">{{ $user->email ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 font-medium">Bergabung</p>
+                        <p class="text-gray-900 font-bold mt-1">{{ $user->created_at ? $user->created_at->format('d M Y') : '-' }}</p>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Bio -->
-                <div>
-                    <label for="bio" class="block text-sm font-bold text-slate-700 mb-2">
-                        Bio / Tentang Saya
-                    </label>
-                    <textarea name="bio" id="bio" rows="3"
-                              placeholder="Ceritakan sedikit tentang diri Anda..."
-                              class="w-full px-3 py-2 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 focus:border-{{ auth()->user()->role === 'admin' ? 'indigo' : (auth()->user()->role === 'petugas' ? 'emerald' : 'blue') }}-500 transition-all resize-none">{{ old('bio', $user->bio) }}</textarea>
-                    <p class="mt-1 text-xs text-slate-500">Max 500 karakter</p>
-                    @error('bio')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Submit Button -->
-                <div class="flex gap-2 pt-2">
-                    <a href="{{ route('profile.index') }}" 
-                       class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors text-center">
-                        Batal
-                    </a>
-                    <button type="submit" 
-                            class="flex-1 px-4 py-2 bg-gradient-to-r 
-                            {{ auth()->user()->role === 'admin' ? 'from-indigo-500 to-purple-600' : 
-                               (auth()->user()->role === 'petugas' ? 'from-emerald-500 to-green-600' : 
-                               'from-blue-500 to-sky-600') }}
-                            text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center">
-                        <i class="fas fa-save mr-2"></i>
-                        Simpan
-                    </button>
-                </div>
+            <!-- ✅ Submit Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <a href="{{ route('profile.index') }}" class="btn-outline justify-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Batal
+                </a>
+                <button type="submit" class="btn-gradient flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                </button>
             </div>
         </form>
     </div>
 
-    <!-- Change Password Form - Compact -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-        <div class="p-4 bg-gradient-to-r from-rose-500 to-red-600">
-            <h3 class="text-base font-bold text-white flex items-center">
-                <i class="fas fa-key mr-2"></i>
-                Ganti Password
-            </h3>
+    <!-- 🔑 Change Password Card -->
+    <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.1s">
+        <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+            <i class="fas fa-lock text-purple-500"></i>
+            Ubah Kata Sandi
+        </h2>
+
+        @if(session('password_success'))
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-4 text-white mb-6 animate-fade-in-up">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ session('password_success') }}</span>
+            </div>
         </div>
-        <form action="{{ route('profile.change-password') }}" method="POST" class="p-4 md:p-6">
+        @endif
+
+        <form action="{{ route('profile.change-password') }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 
-            <div class="space-y-4">
-                <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg">
-                    <p class="text-xs text-amber-800 flex items-start">
-                        <i class="fas fa-exclamation-triangle text-amber-500 mr-2 mt-0.5 flex-shrink-0"></i>
-                        <span>Pastikan password baru Anda kuat dan mudah diingat.</span>
-                    </p>
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Current Password -->
+                <div>
+                    <label for="current_password" class="form-label">Password Saat Ini <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" name="current_password" id="current_password" required
+                               placeholder="Masukkan password lama Anda"
+                               class="form-input pr-12">
+                        <button type="button" class="password-toggle toggle-password" data-target="current_password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    @error('current_password')
+                        <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <!-- Password Fields -->
-                <div class="space-y-3">
-                    <!-- Password Lama -->
-                    <div>
-                        <label for="current_password" class="block text-sm font-bold text-slate-700 mb-2">
-                            Password Lama <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <input type="password" name="current_password" id="current_password" required
-                                   class="w-full px-3 py-2 pr-10 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all">
-                            <button type="button" onclick="togglePassword('current_password')" 
-                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i class="fas fa-eye text-sm" id="current_password-icon"></i>
-                            </button>
-                        </div>
-                        @error('current_password')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
+                <!-- New Password -->
+                <div>
+                    <label for="password" class="form-label">Password Baru <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" name="password" id="password" required
+                               placeholder="Minimal 8 karakter"
+                               class="form-input pr-12">
+                        <button type="button" class="password-toggle toggle-password" data-target="password">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
-
-                    <!-- Password Baru -->
-                    <div>
-                        <label for="password" class="block text-sm font-bold text-slate-700 mb-2">
-                            Password Baru <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <input type="password" name="password" id="password" required
-                                   class="w-full px-3 py-2 pr-10 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all">
-                            <button type="button" onclick="togglePassword('password')" 
-                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i class="fas fa-eye text-sm" id="password-icon"></i>
-                            </button>
-                        </div>
-                        <p class="mt-1 text-xs text-slate-500">Min 6 karakter</p>
-                        @error('password')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Konfirmasi Password -->
-                    <div>
-                        <label for="password_confirmation" class="block text-sm font-bold text-slate-700 mb-2">
-                            Konfirmasi Password <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <input type="password" name="password_confirmation" id="password_confirmation" required
-                                   class="w-full px-3 py-2 pr-10 text-sm border-2 border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all">
-                            <button type="button" onclick="togglePassword('password_confirmation')" 
-                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i class="fas fa-eye text-sm" id="password_confirmation-icon"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <p class="mt-2 text-xs text-gray-600">💡 Gunakan kombinasi huruf besar/kecil, angka, dan simbol untuk keamanan ekstra</p>
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <!-- Submit Button -->
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="this.closest('form').reset();"
-                            class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors">
-                        Reset
-                    </button>
-                    <button type="submit" 
-                            class="flex-1 px-4 py-2 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center">
-                        <i class="fas fa-key mr-2"></i>
-                        Ganti Password
-                    </button>
+                <!-- Confirm Password -->
+                <div>
+                    <label for="password_confirmation" class="form-label">Konfirmasi Password <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" name="password_confirmation" id="password_confirmation" required
+                               placeholder="Ulangi password baru"
+                               class="form-input pr-12">
+                        <button type="button" class="password-toggle toggle-password" data-target="password_confirmation">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    @error('password_confirmation')
+                        <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <a href="{{ route('profile.index') }}" class="btn-outline justify-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Batal
+                </a>
+                <button type="submit" class="btn-gradient flex items-center justify-center">
+                    <i class="fas fa-lock mr-2"></i> Perbarui Password
+                </button>
             </div>
         </form>
     </div>
+
 </div>
 
 <script>
-// Preview foto profil
+// Character Counter
+const bioTextarea = document.getElementById('bio');
+const charCount = document.getElementById('charCount');
+
+if (bioTextarea && charCount) {
+    bioTextarea.addEventListener('input', () => {
+        const len = bioTextarea.value.length;
+        charCount.textContent = `${len}/500`;
+        charCount.className = len <= 500 ? 'font-bold text-purple-600' : 'font-bold text-red-500';
+    });
+}
+
+// Photo Preview
 document.getElementById('foto_profil').addEventListener('change', function(e) {
     const file = e.target.files[0];
-    if (file) {
-        // Validasi ukuran & tipe
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Max 2MB');
-            this.value = '';
-            return;
-        }
-        if (!file.type.match('image.*')) {
-            alert('File harus berupa gambar!');
-            this.value = '';
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const previewImage = document.getElementById('preview-image');
-            const previewInitials = document.getElementById('preview-initials');
-            
-            previewImage.src = e.target.result;
-            previewImage.classList.remove('hidden');
-            
-            if (previewInitials) {
-                previewInitials.classList.add('hidden');
-            }
-        }
-        reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran file melebihi 2MB!');
+        this.value = '';
+        return;
     }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = document.getElementById('preview-image');
+        const initials = document.getElementById('preview-initials');
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+        if (initials) initials.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
 });
 
-// Toggle password visibility
-function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    const icon = document.getElementById(fieldId + '-icon');
-    
-    if (field.type === 'password') {
-        field.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        field.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-}
-</script>
+// Password Toggle
+document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const targetId = this.dataset.target;
+        const input = document.getElementById(targetId);
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+});
 
-<style>
-@keyframes slideIn { 
-    from { opacity: 0; transform: translateY(-10px); } 
-    to { opacity: 1; transform: translateY(0); } 
-}
-.animate-slide-in { animation: slideIn 0.3s ease-out; }
-</style>
+// Smooth scroll to first error
+document.addEventListener('DOMContentLoaded', () => {
+    const firstError = document.querySelector('.text-red-600');
+    if (firstError) {
+        setTimeout(() => {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
+});
+</script>
 @endsection

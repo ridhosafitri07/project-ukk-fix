@@ -64,8 +64,9 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        $request->session()->regenerate();
 
-        return redirect('/dashboard');
+        return redirect()->route('pengguna.dashboard');
     }
 
     public function logout(Request $request)

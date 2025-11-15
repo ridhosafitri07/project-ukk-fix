@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\PengaduanApiController;
 use App\Http\Controllers\Api\UserProfileApiController;
 use App\Http\Controllers\Api\ItemApiController;
+use App\Http\Controllers\Api\NotificationApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,12 @@ Route::prefix('v1')->group(function () {
         Route::prefix('items')->group(function () {
             Route::get('/', [ItemApiController::class, 'index']);
             Route::get('/{id}', [ItemApiController::class, 'show']);
+        });
+
+        // Notification Routes (All authenticated users)
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationApiController::class, 'index']);
+            Route::get('/count', [NotificationApiController::class, 'getUnreadCountOnly']);
         });
         
         // Pengaduan Routes (Pengguna Role)

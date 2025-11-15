@@ -217,13 +217,15 @@ class PengaduanController extends Controller
             ->with('success', 'Pengaduan berhasil dihapus');
     }
 
-    // Riwayat for pengguna: show completed pengaduan with filters and export
+    // Riwayat for pengguna: show all completed and processed pengaduan with filters and export
     public function riwayatIndex()
     {
         $userId = Auth::id();
 
+        // Show pengaduan with status: Diproses, Selesai, Ditolak (exclude Diajukan dan Disetujui)
         $query = Pengaduan::where('id_user', $userId)
-            ->where('status', 'Selesai');
+            ->whereIn('status', ['Diproses', 'Selesai', 'Ditolak'])
+            ->with('item', 'petugas'); // Eager load item dan petugas
 
         if ($dateFrom = request()->get('date_from')) {
             $query->whereDate('tgl_selesai', '>=', $dateFrom);
@@ -247,8 +249,9 @@ class PengaduanController extends Controller
         if ($pengaduan->id_user !== Auth::id()) {
             abort(403);
         }
-        if ($pengaduan->status !== 'Selesai') {
-            return redirect()->route('pengguna.riwayat.index')->with('error', 'Pengaduan belum selesai');
+        // Allow viewing pengaduan yang sudah diproses atau selesai
+        if (!in_array($pengaduan->status, ['Diproses', 'Selesai', 'Ditolak'])) {
+            return redirect()->route('pengguna.riwayat.index')->with('error', 'Pengaduan belum diproses');
         }
         $pengaduan->load('user', 'temporary_items');
         return view('pengguna.riwayat.show', compact('pengaduan'));
@@ -257,7 +260,7 @@ class PengaduanController extends Controller
     public function riwayatExport()
     {
         $userId = Auth::id();
-        $query = Pengaduan::where('id_user', $userId)->where('status', 'Selesai');
+        $query = Pengaduan::where('id_user', $userId)->whereIn('status', ['Diproses', 'Selesai', 'Ditolak']);
 
         if ($dateFrom = request()->get('date_from')) {
             $query->whereDate('tgl_selesai', '>=', $dateFrom);

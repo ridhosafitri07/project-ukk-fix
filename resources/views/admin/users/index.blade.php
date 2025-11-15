@@ -7,61 +7,69 @@
 @section('content')
 <!-- Statistics Cards -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-blue-100">Total Users</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['total'] }}</p>
+                <p class="text-sm font-semibold text-gray-600 mb-1">Total Users</p>
+                <p class="text-3xl font-black text-gray-900">{{ $statistics['total'] }}</p>
             </div>
-            <i class="fas fa-users text-4xl text-blue-200"></i>
+            <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-lg">
+                <i class="fas fa-users"></i>
+            </div>
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-purple-100">Admin</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['admin'] }}</p>
+                <p class="text-sm font-semibold text-gray-600 mb-1">Admin</p>
+                <p class="text-3xl font-black text-gray-900">{{ $statistics['admin'] }}</p>
             </div>
-            <i class="fas fa-user-shield text-4xl text-purple-200"></i>
+            <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">
+                <i class="fas fa-user-shield"></i>
+            </div>
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-green-100">Petugas</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['petugas'] }}</p>
+                <p class="text-sm font-semibold text-gray-600 mb-1">Petugas</p>
+                <p class="text-3xl font-black text-gray-900">{{ $statistics['petugas'] }}</p>
             </div>
-            <i class="fas fa-user-cog text-4xl text-green-200"></i>
+            <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-lg">
+                <i class="fas fa-user-cog"></i>
+            </div>
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-yellow-100">Pengguna</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['pengguna'] }}</p>
+                <p class="text-sm font-semibold text-gray-600 mb-1">Pengguna</p>
+                <p class="text-3xl font-black text-gray-900">{{ $statistics['pengguna'] }}</p>
             </div>
-            <i class="fas fa-user text-4xl text-yellow-200"></i>
+            <div class="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center text-yellow-600 text-lg">
+                <i class="fas fa-user"></i>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Main Content -->
-<div class="bg-white rounded-xl shadow-md overflow-hidden">
+<div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
     <!-- Header with Actions -->
-    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-users text-blue-500 mr-2"></i>
+                    <i class="fas fa-users text-gray-600 mr-2"></i>
                     Daftar Users
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">Kelola semua akun pengguna</p>
             </div>
             <a href="{{ route('admin.users.create') }}" 
-               class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center justify-center shadow-md transform hover:scale-105 transition-all">
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center shadow-sm hover:shadow-md transition-all">
                 <i class="fas fa-plus mr-2"></i>
                 Tambah User
             </a>
@@ -98,14 +106,14 @@
             <!-- Buttons -->
             <div class="flex gap-2">
                 <button type="submit" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center">
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
                     <i class="fas fa-filter mr-2"></i>
                     Filter
                 </button>
                 
                 @if(request('search') || request('role') != 'all')
                 <a href="{{ route('admin.users.index') }}" 
-                   class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex items-center">
+                   class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 flex items-center">
                     <i class="fas fa-times mr-2"></i>
                     Reset
                 </a>
@@ -143,7 +151,7 @@
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold
-                                    {{ $user->role == 'admin' ? 'bg-purple-500' : ($user->role == 'petugas' ? 'bg-green-500' : 'bg-blue-500') }}">
+                                    {{ $user->role == 'admin' ? 'bg-gray-600' : ($user->role == 'petugas' ? 'bg-green-500' : 'bg-blue-500') }}">
                                     {{ strtoupper(substr($user->nama_pengguna, 0, 2)) }}
                                 </div>
                             </div>
@@ -166,7 +174,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex flex-col">
                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                @if($user->role == 'admin') bg-purple-100 text-purple-800
+                                @if($user->role == 'admin') bg-gray-100 text-gray-800
                                 @elseif($user->role == 'petugas') bg-green-100 text-green-800
                                 @else bg-blue-100 text-blue-800 @endif">
                                 <i class="fas fa-{{ $user->role == 'admin' ? 'user-shield' : ($user->role == 'petugas' ? 'user-cog' : 'user') }} mr-1"></i>

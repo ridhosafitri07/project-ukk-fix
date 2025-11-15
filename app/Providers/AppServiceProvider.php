@@ -21,5 +21,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register the app-layout component
         \Illuminate\Support\Facades\Blade::component('app-layout', \App\View\Components\AppLayout::class);
+        
+        // Register NotificationComposer for pengguna layout
+        \Illuminate\Support\Facades\View::composer('layouts.pengguna', \App\View\Composers\NotificationComposer::class);
     }
 }

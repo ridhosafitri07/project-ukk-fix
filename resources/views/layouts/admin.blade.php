@@ -15,19 +15,19 @@
         * { font-family: 'Inter', sans-serif; }
         
         :root {
-            --primary-green: #10b981;
-            --soft-green: #34d399;
-            --light-green: #d1fae5;
+            --primary-gray: #1f2937;
+            --secondary-gray: #374151;
+            --light-gray: #9ca3af;
             --primary-blue: #3b82f6;
             --soft-blue: #60a5fa;
         }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #34d399; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+        ::-webkit-scrollbar-track { background: #f3f4f6; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
         
-        body { background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%); }
+        body { background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); }
         
         .sidebar-link {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -42,7 +42,7 @@
             transform: translateY(-50%);
             width: 4px;
             height: 0;
-            background: linear-gradient(180deg, #10b981, #3b82f6);
+            background: linear-gradient(180deg, #3b82f6, #1f2937);
             border-radius: 0 4px 4px 0;
             transition: height 0.3s ease;
         }
@@ -52,14 +52,14 @@
         }
         
         .sidebar-link.active {
-            background: linear-gradient(135deg, #d1fae5 0%, #dbeafe 100%);
-            color: #047857;
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            color: #1f2937;
             font-weight: 600;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+            box-shadow: 0 2px 8px rgba(31, 41, 55, 0.1);
         }
         
         .sidebar-link:hover:not(.active) {
-            background: linear-gradient(135deg, rgba(209, 250, 229, 0.5), rgba(219, 234, 254, 0.5));
+            background: linear-gradient(135deg, rgba(229, 231, 235, 0.5), rgba(209, 213, 219, 0.5));
             transform: translateX(4px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
@@ -120,14 +120,14 @@
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #1f2937 0%, #3b82f6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         
         .header-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
         }
         
         .dropdown-menu {
@@ -146,22 +146,22 @@
                class="hidden lg:flex fixed left-0 top-0 h-full glass-effect shadow-2xl z-50 flex-col transition-all duration-300">
             
             <!-- Logo Section -->
-            <div class="flex items-center justify-between p-6 border-b border-green-100">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
                 <div x-show="sidebarOpen" class="flex items-center space-x-3 animate-fade-in">
                     <div class="relative">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-gray-700 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3">
                             <i class="fas fa-tools text-white text-xl"></i>
                         </div>
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold gradient-text">SAPRAS</h1>
-                        <p class="text-xs text-green-600 font-medium">Admin Panel</p>
+                        <p class="text-xs text-gray-500 font-medium">Admin Panel</p>
                     </div>
                 </div>
                 <button @click="sidebarOpen = !sidebarOpen" 
-                        class="p-2.5 hover:bg-green-50 rounded-xl transition-all transform hover:scale-110">
-                    <i class="fas fa-bars text-green-600"></i>
+                        class="p-2.5 hover:bg-gray-100 rounded-xl transition-all transform hover:scale-110">
+                    <i class="fas fa-bars text-gray-600"></i>
                 </button>
             </div>
 
@@ -190,7 +190,7 @@
                     </a>
 
                     <!-- Divider -->
-                    <div x-show="sidebarOpen" class="my-4 border-t border-green-100"></div>
+                    <div x-show="sidebarOpen" class="my-4 border-t border-gray-200"></div>
                     <p x-show="sidebarOpen" class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Manajemen Sarpras
                     </p>
@@ -212,34 +212,34 @@
                              x-collapse 
                              class="ml-8 mt-2 space-y-1">
                             <a href="{{ route('admin.sarpras.index') }}" 
-                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-green-50 hover:text-green-700 transition {{ request()->routeIs('admin.sarpras.index') ? 'bg-green-50 text-green-700 font-semibold' : '' }}">
+                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition {{ request()->routeIs('admin.sarpras.index') ? 'bg-gray-100 text-gray-800 font-semibold' : '' }}">
                                 <i class="fas fa-clipboard-check w-4"></i>
                                 <span>Permintaan Sarpras</span>
                             </a>
 
-                            <div class="my-2 border-t border-green-100"></div>
+                            <div class="my-2 border-t border-gray-200"></div>
                             
                             <a href="{{ route('admin.master-lokasi.index') }}" 
-                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-green-50 hover:text-green-700 transition {{ request()->routeIs('admin.master-lokasi.*') ? 'bg-green-50 text-green-700 font-semibold' : '' }}">
+                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition {{ request()->routeIs('admin.master-lokasi.*') ? 'bg-gray-100 text-gray-800 font-semibold' : '' }}">
                                 <i class="fas fa-map-marker-alt w-4"></i>
                                 <span>Master Lokasi</span>
                             </a>
                             
                             <a href="{{ route('admin.master-barang.index') }}" 
-                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-green-50 hover:text-green-700 transition {{ request()->routeIs('admin.master-barang.*') ? 'bg-green-50 text-green-700 font-semibold' : '' }}">
+                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition {{ request()->routeIs('admin.master-barang.*') ? 'bg-gray-100 text-gray-800 font-semibold' : '' }}">
                                 <i class="fas fa-box w-4"></i>
                                 <span>Master Barang</span>
                             </a>
                             
                             <a href="{{ route('admin.relasi.index') }}" 
-                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-green-50 hover:text-green-700 transition {{ request()->routeIs('admin.relasi.*') ? 'bg-green-50 text-green-700 font-semibold' : '' }}">
+                               class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition {{ request()->routeIs('admin.relasi.*') ? 'bg-gray-100 text-gray-800 font-semibold' : '' }}">
                                 <i class="fas fa-link w-4"></i>
                                 <span>Relasi Sarpras</span>
                             </a>
                         </div>
                     </div>
 
-                    <div x-show="sidebarOpen" class="my-4 border-t border-green-100"></div>
+                    <div x-show="sidebarOpen" class="my-4 border-t border-gray-200"></div>
 
                     <a href="{{ route('admin.users.index') }}" 
                        class="sidebar-link flex items-center space-x-3 px-4 py-3.5 rounded-xl text-gray-700 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
@@ -250,15 +250,15 @@
             </nav>
 
             <!-- User Profile -->
-            <div class="p-4 border-t border-green-100">
+            <div class="p-4 border-t border-gray-200">
                 <div class="relative" x-data="{ profileOpen: false }">
                     <button @click="profileOpen = !profileOpen" 
-                            class="w-full flex items-center space-x-3 p-3 hover:bg-green-50 rounded-xl transition-all">
+                            class="w-full flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-xl transition-all">
                         @if(auth()->user()->foto_profil)
                             <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" 
-                                 class="w-11 h-11 rounded-xl object-cover ring-2 ring-green-200">
+                                 class="w-11 h-11 rounded-xl object-cover ring-2 ring-gray-300">
                         @else
-                            <div class="w-11 h-11 bg-gradient-to-br from-green-400 to-blue-500 rounded-xl flex items-center justify-center ring-2 ring-green-200 shadow-lg">
+                            <div class="w-11 h-11 bg-gradient-to-br from-gray-600 to-blue-500 rounded-xl flex items-center justify-center ring-2 ring-gray-300 shadow-lg">
                                 <span class="text-white font-bold">
                                     {{ strtoupper(substr(auth()->user()->nama_pengguna, 0, 2)) }}
                                 </span>
@@ -266,7 +266,7 @@
                         @endif
                         <div x-show="sidebarOpen" class="flex-1 text-left">
                             <p class="text-sm font-semibold text-gray-800 truncate">{{ auth()->user()->nama_pengguna }}</p>
-                            <p class="text-xs text-green-600 font-medium">Administrator</p>
+                            <p class="text-xs text-gray-500 font-medium">Administrator</p>
                         </div>
                         <i x-show="sidebarOpen" class="fas fa-chevron-down text-gray-400 text-sm"></i>
                     </button>
@@ -277,11 +277,11 @@
                          x-transition
                          class="dropdown-menu absolute bottom-full left-0 right-0 mb-2 glass-effect rounded-xl shadow-xl py-2">
                         <a href="{{ route('profile.index') }}" 
-                           class="flex items-center space-x-3 px-4 py-3 hover:bg-green-50 transition-colors">
-                            <i class="fas fa-user-circle text-green-500"></i>
+                           class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-user-circle text-blue-500"></i>
                             <span class="text-sm text-gray-700 font-medium">Profil Saya</span>
                         </a>
-                        <div class="border-t border-green-100 my-1"></div>
+                        <div class="border-t border-gray-200 my-1"></div>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" 
@@ -298,7 +298,7 @@
         <!-- Mobile Menu Button -->
         <button @click="mobileMenu = true" 
                 class="lg:hidden fixed top-4 left-4 z-50 p-3 glass-effect rounded-xl shadow-lg">
-            <i class="fas fa-bars text-green-600"></i>
+            <i class="fas fa-bars text-gray-600"></i>
         </button>
 
         <!-- Mobile Sidebar (sama seperti desktop) -->
@@ -315,7 +315,7 @@
              :class="sidebarOpen ? 'lg:ml-72' : 'lg:ml-20'">
             
             <!-- Header -->
-            <header class="header-gradient border-b border-green-100 sticky top-0 z-30 shadow-sm">
+            <header class="header-gradient border-b border-gray-200 sticky top-0 z-30 shadow-sm">
                 <div class="px-6 lg:px-8 py-5">
                     <div class="flex items-center justify-between">
                         <div class="flex-1 ml-16 lg:ml-0">
@@ -326,8 +326,8 @@
                             <!-- Notification Bell -->
                             <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open" 
-                                        class="relative p-3 hover:bg-green-50 rounded-xl transition-all transform hover:scale-110">
-                                    <i class="fas fa-bell text-green-600 text-lg"></i>
+                                        class="relative p-3 hover:bg-gray-100 rounded-xl transition-all transform hover:scale-110">
+                                    <i class="fas fa-bell text-gray-600 text-lg"></i>
                                     <span class="notification-badge absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
                                 </button>
                                 
@@ -336,33 +336,33 @@
                                      @click.away="open = false"
                                      x-transition
                                      class="dropdown-menu absolute right-0 mt-2 w-80 glass-effect rounded-xl shadow-2xl py-2 max-h-96 overflow-y-auto">
-                                    <div class="px-4 py-3 border-b border-green-100">
+                                    <div class="px-4 py-3 border-b border-gray-200">
                                         <h3 class="font-bold text-gray-800">Notifikasi</h3>
                                         <p class="text-xs text-gray-500">Anda memiliki {{ isset($notifications) ? count($notifications) : 2 }} notifikasi baru</p>
                                     </div>
                                     <div class="p-2">
                                         @if(isset($notifications))
                                             @foreach($notifications as $notification)
-                                            <a href="#" class="flex items-start space-x-3 p-3 hover:bg-green-50 rounded-lg transition">
+                                            <a href="#" class="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg transition">
                                                 <div class="w-10 h-10 bg-{{ $notification['color'] }}-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     <i class="{{ $notification['icon'] }} text-{{ $notification['color'] }}-600"></i>
                                                 </div>
                                                 <div class="flex-1">
                                                     <p class="text-sm font-medium text-gray-800">{{ $notification['title'] }}</p>
                                                     <p class="text-xs text-gray-500 mt-1">{{ $notification['message'] }}</p>
-                                                    <p class="text-xs text-green-600 mt-1">{{ $notification['time'] }}</p>
+                                                    <p class="text-xs text-blue-600 mt-1">{{ $notification['time'] }}</p>
                                                 </div>
                                             </a>
                                             @endforeach
                                         @else
-                                        <a href="#" class="flex items-start space-x-3 p-3 hover:bg-green-50 rounded-lg transition">
+                                        <a href="#" class="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg transition">
                                             <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <i class="fas fa-clipboard-list text-blue-600"></i>
                                             </div>
                                             <div class="flex-1">
                                                 <p class="text-sm font-medium text-gray-800">Sistem Normal</p>
                                                 <p class="text-xs text-gray-500 mt-1">Semua sistem berjalan normal</p>
-                                                <p class="text-xs text-green-600 mt-1">Baru saja</p>
+                                                <p class="text-xs text-blue-600 mt-1">Baru saja</p>
                                             </div>
                                         </a>
                                         @endif
@@ -371,7 +371,7 @@
                             </div>
                             
                             <!-- Date Display -->
-                            <div class="hidden md:block text-right px-4 py-2.5 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-100">
+                            <div class="hidden md:block text-right px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
                                 <p class="text-xs text-gray-500 font-medium">{{ date('l') }}</p>
                                 <p class="text-sm font-bold text-gray-700">{{ date('d M Y') }}</p>
                             </div>
@@ -386,7 +386,7 @@
             </main>
 
             <!-- Footer -->
-            <footer class="glass-effect border-t border-green-100 py-4 px-6 lg:px-8">
+            <footer class="glass-effect border-t border-gray-200 py-4 px-6 lg:px-8">
                 <div class="flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 space-y-2 md:space-y-0">
                     <p class="font-medium">&copy; {{ date('Y') }} <span class="gradient-text font-bold">SAPRAS</span> - Sistem Manajemen Sarana Prasarana</p>
                     <p class="text-gray-500">Version 1.0.0</p>
@@ -409,7 +409,7 @@
             };
             
             const colors = {
-                success: 'from-green-400 to-emerald-500',
+                success: 'from-blue-400 to-blue-600',
                 error: 'from-red-400 to-rose-500',
                 warning: 'from-yellow-400 to-amber-500',
                 info: 'from-blue-400 to-cyan-500'
